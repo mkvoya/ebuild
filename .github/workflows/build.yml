@@ -90,12 +90,6 @@ jobs:
           tar -Jxf libxml2-2.9.9.tar.xz && cd libxml2-2.9.9
           ./configure --disable-shared && make -j4
           sudo make install
-      - name: Install Libffi
-        run: |
-          curl -LO https://github.com/libffi/libffi/releases/download/v3.5.2/libffi-3.5.2.tar.gz
-          tar -Jxf libffi-3.5.2.tar.gz && cd libffi-3.5.2
-          ./configure --disable-shared && make -j4
-          sudo make install
       - name: Install GNU Libgmp
         run: |
           curl -O https://ftp.gnu.org/gnu/gmp/gmp-6.3.0.tar.gz
