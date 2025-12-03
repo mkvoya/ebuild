@@ -144,6 +144,7 @@ jobs:
                                       --with-native-image-api          \
                                       --with-ns                        \
                                       --with-small-ja-dic              \
+                                      --with-threads                   \
                                       --with-toolkit-scroll-bars       \
                                       --with-tree-sitter               \
                                       --with-xml2                      \
