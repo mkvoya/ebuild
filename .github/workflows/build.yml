@@ -132,6 +132,9 @@ jobs:
         run: |
           git clone -b 'feature/igc' --depth 1 https://github.com/emacs-mirror/emacs.git
           cd emacs && sed -i '' '/darwin/ s/lncurses/lncursesw/g' configure.ac
+          patch -p1 < ../patches/system-appearance.patch
+          patch -p1 < ../patches/ksqsf-smooth-cursor.patch
+          patch -p1 < ../patches/round-undecorated-frame.patch
           ./autogen.sh && ./configure CFLAGS='-g0 -O2 -flto=thin'      \
                                       PKG_CONFIG='pkg-config -static'  \
                                       --disable-gc-mark-trace          \
