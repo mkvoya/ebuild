@@ -132,7 +132,7 @@ jobs:
         run: |
           git clone --depth 1 https://github.com/emacs-mirror/emacs.git
           cd emacs && sed -i '' '/darwin/ s/lncurses/lncursesw/g' configure.ac
-          ./autogen.sh && ./configure CFLAGS='-g0 -O2'                 \
+          ./autogen.sh && ./configure CFLAGS='-g0 -O2 -flto=thin'      \
                                       PKG_CONFIG='pkg-config -static'  \
                                       --disable-gc-mark-trace          \
                                       --without-all                    \
