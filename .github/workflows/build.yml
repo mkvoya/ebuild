@@ -30,7 +30,6 @@ jobs:
       - name: Install tmate
         if: github.event_name == 'workflow_dispatch' && github.event.inputs.debug == 'true'
         run: |
-          brew install tmate
           curl -LO https://github.com/tmate-io/tmate/archive/refs/tags/2.4.0.tar.gz
           tar -zxf 2.4.0.tar.gz && cd tmate-2.4.0
           ./autogen.sh && ./configure && make -j4
