@@ -27,6 +27,14 @@ jobs:
           sudo rm -rf /opt/homebrew
           export PATH=''
           eval $(/usr/libexec/path_helper -s)
+      - name: Install tmate
+        if: github.event_name == 'workflow_dispatch' && github.event.inputs.debug == 'true'
+        run: |
+          brew install tmate
+          curl -LO https://github.com/tmate-io/tmate/archive/refs/tags/2.4.0.tar.gz
+          tar -zxf 2.4.0.tar.gz && cd tmate-2.4.0
+          ./autogen.sh && ./configure && make -j4
+          sudo make install
       - name: Install GNU M4
         run: |
           curl -LO https://ftpmirror.gnu.org/gnu/m4/m4-1.4.20.tar.gz
@@ -141,6 +149,8 @@ jobs:
       - name: Setup tmate session
         if: github.event_name == 'workflow_dispatch' && github.event.inputs.debug == 'true'
         uses: mxschmitt/action-tmate@v3
+        with:
+          install-dependencies: false
       - name: Build Emacs
         run: |
           git clone --depth 1 https://github.com/emacs-mirror/emacs.git
