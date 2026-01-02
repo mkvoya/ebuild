@@ -8,6 +8,11 @@ on:
         required: false
         default: false
         type: boolean
+      early-debug:
+        description: 'Enable early debug session'
+        required: false
+        default: false
+        type: boolean
   schedule:
     - cron: '0 0 * * *'
 
@@ -20,6 +25,7 @@ jobs:
         with:
           fetch-depth: 1
       - name: Setup tmate session
+        if: github.event_name == 'workflow_dispatch' && github.event.inputs.early-debug == 'true'
         uses: mxschmitt/action-tmate@v3
       - name: Uninstall Homebrew
         run: |
@@ -29,122 +35,295 @@ jobs:
           sudo rm -rf /opt/homebrew
           export PATH=''
           eval $(/usr/libexec/path_helper -s)
+      - name: Setup dependencies directory
+        run: |
+          sudo mkdir -p /usr/local/deps
+          echo "DEPS_PREFIX=/usr/local/deps" >> $GITHUB_ENV
+      - name: Cache GNU M4
+        id: cache-m4
+        uses: actions/cache@v4
+        with:
+          path: /usr/local/deps/m4
+          key: m4-1.4.20-${{ runner.os }}
       - name: Install GNU M4
+        if: steps.cache-m4.outputs.cache-hit != 'true'
         run: |
           curl -LO https://ftpmirror.gnu.org/gnu/m4/m4-1.4.20.tar.gz
           tar -zxf m4-1.4.20.tar.gz && cd m4-1.4.20
-          ./configure && make -j4
+          ./configure --prefix=/usr/local/deps/m4 && make -j4
           sudo make install
+      - name: Cache GNU Autoconf
+        id: cache-autoconf
+        uses: actions/cache@v4
+        with:
+          path: /usr/local/deps/autoconf
+          key: autoconf-2.72-${{ runner.os }}
       - name: Install GNU Autoconf
+        if: steps.cache-autoconf.outputs.cache-hit != 'true'
         run: |
+          export PATH="/usr/local/deps/m4/bin:$PATH"
           curl -LO https://ftpmirror.gnu.org/gnu/autoconf/autoconf-2.72.tar.gz
           tar -zxf autoconf-2.72.tar.gz && cd autoconf-2.72
-          ./configure && make -j4
+          ./configure --prefix=/usr/local/deps/autoconf && make -j4
           sudo make install
+      - name: Cache GNU Automake
+        id: cache-automake
+        uses: actions/cache@v4
+        with:
+          path: /usr/local/deps/automake
+          key: automake-1.18-${{ runner.os }}
       - name: Install GNU Automake
+        if: steps.cache-automake.outputs.cache-hit != 'true'
         run: |
+          export PATH="/usr/local/deps/m4/bin:/usr/local/deps/autoconf/bin:$PATH"
           curl -LO https://ftpmirror.gnu.org/gnu/automake/automake-1.18.tar.gz
           tar -zxf automake-1.18.tar.gz && cd automake-1.18
-          ./configure && make -j4
+          ./configure --prefix=/usr/local/deps/automake && make -j4
           sudo make install
+      - name: Cache GNU Libtool
+        id: cache-libtool
+        uses: actions/cache@v4
+        with:
+          path: /usr/local/deps/libtool
+          key: libtool-2.5.4-${{ runner.os }}
       - name: Install GNU Libtool
+        if: steps.cache-libtool.outputs.cache-hit != 'true'
         run: |
+          export PATH="/usr/local/deps/m4/bin:/usr/local/deps/autoconf/bin:/usr/local/deps/automake/bin:$PATH"
           curl -LO https://ftpmirror.gnu.org/gnu/libtool/libtool-2.5.4.tar.gz
           tar -zxf libtool-2.5.4.tar.gz && cd libtool-2.5.4
-          ./configure --disable-shared && make -j4
+          ./configure --prefix=/usr/local/deps/libtool --disable-shared && make -j4
           sudo make install
+      - name: Cache Pkgconf
+        id: cache-pkgconf
+        uses: actions/cache@v4
+        with:
+          path: /usr/local/deps/pkgconf
+          key: pkgconf-2.5.1-${{ runner.os }}
       - name: Install Pkgconf
+        if: steps.cache-pkgconf.outputs.cache-hit != 'true'
         run: |
+          export PATH="/usr/local/deps/m4/bin:/usr/local/deps/autoconf/bin:/usr/local/deps/automake/bin:/usr/local/deps/libtool/bin:$PATH"
           curl -LO https://github.com/pkgconf/pkgconf/archive/refs/tags/pkgconf-2.5.1.tar.gz
           tar -zxf pkgconf-2.5.1.tar.gz && cd pkgconf-pkgconf-2.5.1
-          ./autogen.sh && ./configure --disable-shared && make -j4
+          ./autogen.sh && ./configure --prefix=/usr/local/deps/pkgconf --disable-shared && make -j4
           sudo make install
-          sudo ln -s /usr/local/bin/pkgconf /usr/local/bin/pkg-config
+      - name: Cache GNU Texinfo
+        id: cache-texinfo
+        uses: actions/cache@v4
+        with:
+          path: /usr/local/deps/texinfo
+          key: texinfo-7.2-${{ runner.os }}
       - name: Install GNU Texinfo
+        if: steps.cache-texinfo.outputs.cache-hit != 'true'
         run: |
+          export PATH="/usr/local/deps/m4/bin:/usr/local/deps/autoconf/bin:/usr/local/deps/automake/bin:/usr/local/deps/libtool/bin:$PATH"
           curl -LO https://ftpmirror.gnu.org/gnu/texinfo/texinfo-7.2.tar.gz
           tar -zxf texinfo-7.2.tar.gz && cd texinfo-7.2
-          ./configure && make -j4
+          ./configure --prefix=/usr/local/deps/texinfo && make -j4
           sudo make install
+      - name: Cache GNU Libiconv
+        id: cache-libiconv
+        uses: actions/cache@v4
+        with:
+          path: /usr/local/deps/libiconv
+          key: libiconv-1.18-${{ runner.os }}
       - name: Install GNU Libiconv
+        if: steps.cache-libiconv.outputs.cache-hit != 'true'
         run: |
           curl -LO https://ftpmirror.gnu.org/gnu/libiconv/libiconv-1.18.tar.gz
           tar -zxf libiconv-1.18.tar.gz && cd libiconv-1.18
-          ./configure --disable-shared && make -j4
+          ./configure --prefix=/usr/local/deps/libiconv --disable-shared && make -j4
           sudo make install
+      - name: Cache GNU Libunistring
+        id: cache-libunistring
+        uses: actions/cache@v4
+        with:
+          path: /usr/local/deps/libunistring
+          key: libunistring-1.4.1-${{ runner.os }}
       - name: Install GNU Libunistring
+        if: steps.cache-libunistring.outputs.cache-hit != 'true'
         run: |
+          export PATH="/usr/local/deps/m4/bin:/usr/local/deps/autoconf/bin:/usr/local/deps/automake/bin:/usr/local/deps/libtool/bin:$PATH"
+          export PKG_CONFIG_PATH="/usr/local/deps/libiconv/lib/pkgconfig:$PKG_CONFIG_PATH"
+          export CPPFLAGS="-I/usr/local/deps/libiconv/include $CPPFLAGS"
+          export LDFLAGS="-L/usr/local/deps/libiconv/lib $LDFLAGS"
           curl -LO https://ftpmirror.gnu.org/gnu/libunistring/libunistring-1.4.1.tar.gz
           tar -zxf libunistring-1.4.1.tar.gz && cd libunistring-1.4.1
-          ./configure --disable-shared && make -j4
+          ./configure --prefix=/usr/local/deps/libunistring --disable-shared && make -j4
           sudo make install
+      - name: Cache GNU Gettext
+        id: cache-gettext
+        uses: actions/cache@v4
+        with:
+          path: /usr/local/deps/gettext
+          key: gettext-0.26-${{ runner.os }}
       - name: Install GNU Gettext
+        if: steps.cache-gettext.outputs.cache-hit != 'true'
         run: |
+          export PATH="/usr/local/deps/m4/bin:/usr/local/deps/autoconf/bin:/usr/local/deps/automake/bin:/usr/local/deps/libtool/bin:$PATH"
+          export PKG_CONFIG_PATH="/usr/local/deps/libiconv/lib/pkgconfig:/usr/local/deps/libunistring/lib/pkgconfig:$PKG_CONFIG_PATH"
+          export CPPFLAGS="-I/usr/local/deps/libiconv/include -I/usr/local/deps/libunistring/include $CPPFLAGS"
+          export LDFLAGS="-L/usr/local/deps/libiconv/lib -L/usr/local/deps/libunistring/lib $LDFLAGS"
           curl -LO https://ftpmirror.gnu.org/gnu/gettext/gettext-0.26.tar.gz
           tar -zxf gettext-0.26.tar.gz && cd gettext-0.26
-          ./configure --disable-shared && make -j4
+          ./configure --prefix=/usr/local/deps/gettext --disable-shared && make -j4
           sudo make install
+      - name: Cache GNU Ncurses
+        id: cache-ncurses
+        uses: actions/cache@v4
+        with:
+          path: /usr/local/deps/ncurses
+          key: ncurses-6.5-${{ runner.os }}
       - name: Install GNU Ncurses
+        if: steps.cache-ncurses.outputs.cache-hit != 'true'
         run: |
+          export PATH="/usr/local/deps/m4/bin:/usr/local/deps/autoconf/bin:/usr/local/deps/automake/bin:/usr/local/deps/libtool/bin:$PATH"
           curl -LO https://ftpmirror.gnu.org/gnu/ncurses/ncurses-6.5.tar.gz
           tar -zxf ncurses-6.5.tar.gz && cd ncurses-6.5
-          ./configure --disable-shared && make -j4
+          ./configure --prefix=/usr/local/deps/ncurses --disable-shared && make -j4
           sudo make install
-          sudo ln -s /usr/local/include/ncursesw/curses.h /usr/local/include/ncurses.h
+          sudo ln -s /usr/local/deps/ncurses/include/ncursesw/curses.h /usr/local/deps/ncurses/include/ncurses.h
+      - name: Cache Zlib
+        id: cache-zlib
+        uses: actions/cache@v4
+        with:
+          path: /usr/local/deps/zlib
+          key: zlib-1.3.1-${{ runner.os }}
       - name: Install Zlib
+        if: steps.cache-zlib.outputs.cache-hit != 'true'
         run: |
+          export PATH="/usr/local/deps/m4/bin:/usr/local/deps/autoconf/bin:/usr/local/deps/automake/bin:/usr/local/deps/libtool/bin:$PATH"
           curl -LO https://github.com/madler/zlib/releases/download/v1.3.1/zlib-1.3.1.tar.gz
           tar -zxf zlib-1.3.1.tar.gz && cd zlib-1.3.1
-          ./configure --static && make -j4
+          ./configure --prefix=/usr/local/deps/zlib --static && make -j4
           sudo make install
+      - name: Cache Libxml2
+        id: cache-libxml2
+        uses: actions/cache@v4
+        with:
+          path: /usr/local/deps/libxml2
+          key: libxml2-2.9.9-${{ runner.os }}
       - name: Install Libxml2
+        if: steps.cache-libxml2.outputs.cache-hit != 'true'
         run: |
+          export PATH="/usr/local/deps/m4/bin:/usr/local/deps/autoconf/bin:/usr/local/deps/automake/bin:/usr/local/deps/libtool/bin:$PATH"
+          export PKG_CONFIG_PATH="/usr/local/deps/zlib/lib/pkgconfig:$PKG_CONFIG_PATH"
+          export CPPFLAGS="-I/usr/local/deps/zlib/include $CPPFLAGS"
+          export LDFLAGS="-L/usr/local/deps/zlib/lib $LDFLAGS"
           curl -O https://download.gnome.org/sources/libxml2/2.9/libxml2-2.9.9.tar.xz
           tar -Jxf libxml2-2.9.9.tar.xz && cd libxml2-2.9.9
-          ./configure --disable-shared && make -j4
+          ./configure --prefix=/usr/local/deps/libxml2 --disable-shared && make -j4
           sudo make install
+      - name: Cache GNU Libgmp
+        id: cache-gmp
+        uses: actions/cache@v4
+        with:
+          path: /usr/local/deps/gmp
+          key: gmp-6.3.0-${{ runner.os }}
       - name: Install GNU Libgmp
+        if: steps.cache-gmp.outputs.cache-hit != 'true'
         run: |
+          export PATH="/usr/local/deps/m4/bin:/usr/local/deps/autoconf/bin:/usr/local/deps/automake/bin:/usr/local/deps/libtool/bin:$PATH"
           curl -LO https://ftpmirror.gnu.org/gnu/gmp/gmp-6.3.0.tar.gz
           tar -zxf gmp-6.3.0.tar.gz && cd gmp-6.3.0
-          ./configure --disable-shared && make -j4
+          ./configure --prefix=/usr/local/deps/gmp --disable-shared && make -j4
           sudo make install
+      - name: Cache Libnettle
+        id: cache-nettle
+        uses: actions/cache@v4
+        with:
+          path: /usr/local/deps/nettle
+          key: nettle-3.10.2-${{ runner.os }}
       - name: Install Libnettle
+        if: steps.cache-nettle.outputs.cache-hit != 'true'
         run: |
+          export PATH="/usr/local/deps/m4/bin:/usr/local/deps/autoconf/bin:/usr/local/deps/automake/bin:/usr/local/deps/libtool/bin:$PATH"
+          export PKG_CONFIG_PATH="/usr/local/deps/gmp/lib/pkgconfig:$PKG_CONFIG_PATH"
+          export CPPFLAGS="-I/usr/local/deps/gmp/include $CPPFLAGS"
+          export LDFLAGS="-L/usr/local/deps/gmp/lib $LDFLAGS"
           curl -LO https://ftpmirror.gnu.org/gnu/nettle/nettle-3.10.2.tar.gz
           tar -zxf nettle-3.10.2.tar.gz && cd nettle-3.10.2
-          ./configure --disable-shared && make -j4
+          ./configure --prefix=/usr/local/deps/nettle --disable-shared && make -j4
           sudo make install
+      - name: Cache Libidn2
+        id: cache-libidn2
+        uses: actions/cache@v4
+        with:
+          path: /usr/local/deps/libidn2
+          key: libidn2-2.3.8-${{ runner.os }}
       - name: Install Libidn2
+        if: steps.cache-libidn2.outputs.cache-hit != 'true'
         run: |
+          export PATH="/usr/local/deps/m4/bin:/usr/local/deps/autoconf/bin:/usr/local/deps/automake/bin:/usr/local/deps/libtool/bin:$PATH"
+          export PKG_CONFIG_PATH="/usr/local/deps/libunistring/lib/pkgconfig:$PKG_CONFIG_PATH"
+          export CPPFLAGS="-I/usr/local/deps/libunistring/include $CPPFLAGS"
+          export LDFLAGS="-L/usr/local/deps/libunistring/lib $LDFLAGS"
           curl -LO https://ftpmirror.gnu.org/gnu/libidn/libidn2-2.3.8.tar.gz
           tar -zxf libidn2-2.3.8.tar.gz && cd libidn2-2.3.8
-          ./configure --disable-shared && make -j4
+          ./configure --prefix=/usr/local/deps/libidn2 --disable-shared && make -j4
           sudo make install
+      - name: Cache GnuTLS
+        id: cache-gnutls
+        uses: actions/cache@v4
+        with:
+          path: /usr/local/deps/gnutls
+          key: gnutls-3.8.11-${{ runner.os }}
       - name: Install GnuTLS
+        if: steps.cache-gnutls.outputs.cache-hit != 'true'
         run: |
+          export PATH="/usr/local/deps/m4/bin:/usr/local/deps/autoconf/bin:/usr/local/deps/automake/bin:/usr/local/deps/libtool/bin:$PATH"
+          export PKG_CONFIG_PATH="/usr/local/deps/nettle/lib/pkgconfig:/usr/local/deps/libidn2/lib/pkgconfig:/usr/local/deps/gmp/lib/pkgconfig:/usr/local/deps/libunistring/lib/pkgconfig:$PKG_CONFIG_PATH"
+          export CPPFLAGS="-I/usr/local/deps/nettle/include -I/usr/local/deps/libidn2/include -I/usr/local/deps/gmp/include -I/usr/local/deps/libunistring/include $CPPFLAGS"
+          export LDFLAGS="-L/usr/local/deps/nettle/lib -L/usr/local/deps/libidn2/lib -L/usr/local/deps/gmp/lib -L/usr/local/deps/libunistring/lib $LDFLAGS"
           curl -O https://www.gnupg.org/ftp/gcrypt/gnutls/v3.8/gnutls-3.8.11.tar.xz
           tar -Jxf gnutls-3.8.11.tar.xz && cd gnutls-3.8.11
-          ./configure --disable-shared --with-included-libtasn1 --without-p11-kit && make -j4
+          ./configure --prefix=/usr/local/deps/gnutls --disable-shared --with-included-libtasn1 --without-p11-kit && make -j4
           sudo make install
+      - name: Cache Libtreesitter
+        id: cache-treesitter
+        uses: actions/cache@v4
+        with:
+          path: /usr/local/deps/treesitter
+          key: treesitter-0.25.10-${{ runner.os }}
       - name: Install Libtreesitter
+        if: steps.cache-treesitter.outputs.cache-hit != 'true'
         run: |
+          export PATH="/usr/local/deps/m4/bin:/usr/local/deps/autoconf/bin:/usr/local/deps/automake/bin:/usr/local/deps/libtool/bin:$PATH"
           curl -LO https://github.com/tree-sitter/tree-sitter/archive/refs/tags/v0.25.10.tar.gz
           tar -zxf v0.25.10.tar.gz && cd tree-sitter-0.25.10
-          ./configure && make -j4
+          ./configure --prefix=/usr/local/deps/treesitter && make -j4
           sudo make install
-          sudo find /usr/local/lib -name 'libtree-sitter*.dylib' -delete
+          sudo find /usr/local/deps/treesitter/lib -name 'libtree-sitter*.dylib' -delete
+      - name: Cache GNU Gzip
+        id: cache-gzip
+        uses: actions/cache@v4
+        with:
+          path: /usr/local/deps/gzip
+          key: gzip-1.14-${{ runner.os }}
       - name: Install GNU Gzip
+        if: steps.cache-gzip.outputs.cache-hit != 'true'
         run: |
+          export PATH="/usr/local/deps/m4/bin:/usr/local/deps/autoconf/bin:/usr/local/deps/automake/bin:/usr/local/deps/libtool/bin:$PATH"
           curl -LO https://ftpmirror.gnu.org/gnu/gzip/gzip-1.14.tar.gz
           tar -zxf gzip-1.14.tar.gz && cd gzip-1.14
-          ./configure && make -j4
+          ./configure --prefix=/usr/local/deps/gzip && make -j4
           sudo make install
+      - name: Setup build environment
+        run: |
+          export PATH="/usr/local/deps/m4/bin:/usr/local/deps/autoconf/bin:/usr/local/deps/automake/bin:/usr/local/deps/libtool/bin:/usr/local/deps/pkgconf/bin:/usr/local/deps/texinfo/bin:/usr/local/deps/gzip/bin:$PATH"
+          export PKG_CONFIG_PATH="/usr/local/deps/libiconv/lib/pkgconfig:/usr/local/deps/libunistring/lib/pkgconfig:/usr/local/deps/gettext/lib/pkgconfig:/usr/local/deps/ncurses/lib/pkgconfig:/usr/local/deps/zlib/lib/pkgconfig:/usr/local/deps/libxml2/lib/pkgconfig:/usr/local/deps/gmp/lib/pkgconfig:/usr/local/deps/nettle/lib/pkgconfig:/usr/local/deps/libidn2/lib/pkgconfig:/usr/local/deps/gnutls/lib/pkgconfig:/usr/local/deps/treesitter/lib/pkgconfig:$PKG_CONFIG_PATH"
+          export CPPFLAGS="-I/usr/local/deps/libiconv/include -I/usr/local/deps/libunistring/include -I/usr/local/deps/gettext/include -I/usr/local/deps/ncurses/include -I/usr/local/deps/zlib/include -I/usr/local/deps/libxml2/include -I/usr/local/deps/gmp/include -I/usr/local/deps/nettle/include -I/usr/local/deps/libidn2/include -I/usr/local/deps/gnutls/include -I/usr/local/deps/treesitter/include $CPPFLAGS"
+          export LDFLAGS="-L/usr/local/deps/libiconv/lib -L/usr/local/deps/libunistring/lib -L/usr/local/deps/gettext/lib -L/usr/local/deps/ncurses/lib -L/usr/local/deps/zlib/lib -L/usr/local/deps/libxml2/lib -L/usr/local/deps/gmp/lib -L/usr/local/deps/nettle/lib -L/usr/local/deps/libidn2/lib -L/usr/local/deps/gnutls/lib -L/usr/local/deps/treesitter/lib $LDFLAGS"
+          echo "PATH=$PATH" >> $GITHUB_ENV
+          echo "PKG_CONFIG_PATH=$PKG_CONFIG_PATH" >> $GITHUB_ENV
+          echo "CPPFLAGS=$CPPFLAGS" >> $GITHUB_ENV
+          echo "LDFLAGS=$LDFLAGS" >> $GITHUB_ENV
       - name: Install libevent
         run: |
           curl -LO https://github.com/libevent/libevent/releases/download/release-2.1.12-stable/libevent-2.1.12-stable.tar.gz
           tar -zxf libevent-2.1.12-stable.tar.gz && cd libevent-2.1.12-stable
-          ./configure && make -j4
+          ./configure --prefix=/usr/local && make -j4
           sudo make install
       - name: Install tmate
         if: github.event_name == 'workflow_dispatch' && github.event.inputs.debug == 'true'
@@ -167,6 +346,9 @@ jobs:
           patch -p1 < ../patches/round-undecorated-frame.patch
           ./autogen.sh && ./configure CFLAGS='-O2 -g0 -flto=thin'   \
                                       PKG_CONFIG='pkgconf -static'  \
+                                      PKG_CONFIG_PATH="$PKG_CONFIG_PATH" \
+                                      CPPFLAGS="$CPPFLAGS"          \
+                                      LDFLAGS="$LDFLAGS"             \
                                       --disable-gc-mark-trace       \
                                       --without-all                 \
                                       --with-compress-install       \
@@ -191,6 +373,9 @@ jobs:
           cd emacs-igc && sed -i '' '/darwin/ s/lncurses/lncursesw/g' configure.ac
           ./autogen.sh && ./configure CFLAGS='-O2 -g0 -flto=thin'   \
                                       PKG_CONFIG='pkgconf -static'  \
+                                      PKG_CONFIG_PATH="$PKG_CONFIG_PATH" \
+                                      CPPFLAGS="$CPPFLAGS"          \
+                                      LDFLAGS="$LDFLAGS"             \
                                       --disable-gc-mark-trace       \
                                       --without-all                 \
                                       --with-compress-install       \
