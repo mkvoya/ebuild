@@ -31,119 +31,119 @@ jobs:
         run: |
           curl -LO https://ftpmirror.gnu.org/gnu/m4/m4-1.4.20.tar.gz
           tar -zxf m4-1.4.20.tar.gz && cd m4-1.4.20
-          ./configure && make -j4
+          ./configure --cache-file=$PWD/config.cache && make -j4
           sudo make install
       - name: Install GNU Autoconf
         run: |
           curl -LO https://ftpmirror.gnu.org/gnu/autoconf/autoconf-2.72.tar.gz
           tar -zxf autoconf-2.72.tar.gz && cd autoconf-2.72
-          ./configure && make -j4
+          ./configure --cache-file=$PWD/config.cache && make -j4
           sudo make install
       - name: Install GNU Automake
         run: |
           curl -LO https://ftpmirror.gnu.org/gnu/automake/automake-1.18.tar.gz
           tar -zxf automake-1.18.tar.gz && cd automake-1.18
-          ./configure && make -j4
+          ./configure --cache-file=$PWD/config.cache && make -j4
           sudo make install
       - name: Install GNU Libtool
         run: |
           curl -LO https://ftpmirror.gnu.org/gnu/libtool/libtool-2.5.4.tar.gz
           tar -zxf libtool-2.5.4.tar.gz && cd libtool-2.5.4
-          ./configure --disable-shared && make -j4
+          ./configure --disable-shared --cache-file=$PWD/config.cache && make -j4
           sudo make install
       - name: Install Pkgconf
         run: |
           curl -LO https://github.com/pkgconf/pkgconf/archive/refs/tags/pkgconf-2.5.1.tar.gz
           tar -zxf pkgconf-2.5.1.tar.gz && cd pkgconf-pkgconf-2.5.1
-          ./autogen.sh && ./configure --disable-shared && make -j4
+          ./autogen.sh && ./configure --disable-shared --cache-file=$PWD/config.cache && make -j4
           sudo make install
           sudo ln -s /usr/local/bin/pkgconf /usr/local/bin/pkg-config
       - name: Install GNU Texinfo
         run: |
           curl -LO https://ftpmirror.gnu.org/gnu/texinfo/texinfo-7.2.tar.gz
           tar -zxf texinfo-7.2.tar.gz && cd texinfo-7.2
-          ./configure && make -j4
+          ./configure --cache-file=$PWD/config.cache && make -j4
           sudo make install
       - name: Install GNU Libiconv
         run: |
           curl -LO https://ftpmirror.gnu.org/gnu/libiconv/libiconv-1.18.tar.gz
           tar -zxf libiconv-1.18.tar.gz && cd libiconv-1.18
-          ./configure --disable-shared && make -j4
+          ./configure --disable-shared --cache-file=$PWD/config.cache && make -j4
           sudo make install
       - name: Install GNU Libunistring
         run: |
           curl -LO https://ftpmirror.gnu.org/gnu/libunistring/libunistring-1.4.1.tar.gz
           tar -zxf libunistring-1.4.1.tar.gz && cd libunistring-1.4.1
-          ./configure --disable-shared && make -j4
+          ./configure --disable-shared --cache-file=$PWD/config.cache && make -j4
           sudo make install
       - name: Install GNU Gettext
         run: |
           curl -LO https://ftpmirror.gnu.org/gnu/gettext/gettext-0.26.tar.gz
           tar -zxf gettext-0.26.tar.gz && cd gettext-0.26
-          ./configure --disable-shared && make -j4
+          ./configure --disable-shared --cache-file=$PWD/config.cache && make -j4
           sudo make install
       - name: Install GNU Ncurses
         run: |
           curl -LO https://ftpmirror.gnu.org/gnu/ncurses/ncurses-6.5.tar.gz
           tar -zxf ncurses-6.5.tar.gz && cd ncurses-6.5
-          ./configure --disable-shared && make -j4
+          ./configure --disable-shared --cache-file=$PWD/config.cache && make -j4
           sudo make install
           sudo ln -s /usr/local/include/ncursesw/curses.h /usr/local/include/ncurses.h
       - name: Install Zlib
         run: |
           curl -LO https://github.com/madler/zlib/releases/download/v1.3.1/zlib-1.3.1.tar.gz
           tar -zxf zlib-1.3.1.tar.gz && cd zlib-1.3.1
-          ./configure --static && make -j4
+          ./configure --static --cache-file=$PWD/config.cache && make -j4
           sudo make install
       - name: Install Libxml2
         run: |
           curl -O https://download.gnome.org/sources/libxml2/2.9/libxml2-2.9.9.tar.xz
           tar -Jxf libxml2-2.9.9.tar.xz && cd libxml2-2.9.9
-          ./configure --disable-shared && make -j4
+          ./configure --disable-shared --cache-file=$PWD/config.cache && make -j4
           sudo make install
       - name: Install GNU Libgmp
         run: |
           curl -LO https://ftpmirror.gnu.org/gnu/gmp/gmp-6.3.0.tar.gz
           tar -zxf gmp-6.3.0.tar.gz && cd gmp-6.3.0
-          ./configure --disable-shared && make -j4
+          ./configure --disable-shared --cache-file=$PWD/config.cache && make -j4
           sudo make install
       - name: Install Libnettle
         run: |
           curl -LO https://ftpmirror.gnu.org/gnu/nettle/nettle-3.10.2.tar.gz
           tar -zxf nettle-3.10.2.tar.gz && cd nettle-3.10.2
-          ./configure --disable-shared && make -j4
+          ./configure --disable-shared --cache-file=$PWD/config.cache && make -j4
           sudo make install
       - name: Install Libidn2
         run: |
           curl -LO https://ftpmirror.gnu.org/gnu/libidn/libidn2-2.3.8.tar.gz
           tar -zxf libidn2-2.3.8.tar.gz && cd libidn2-2.3.8
-          ./configure --disable-shared && make -j4
+          ./configure --disable-shared --cache-file=$PWD/config.cache && make -j4
           sudo make install
       - name: Install GnuTLS
         run: |
           curl -O https://www.gnupg.org/ftp/gcrypt/gnutls/v3.8/gnutls-3.8.11.tar.xz
           tar -Jxf gnutls-3.8.11.tar.xz && cd gnutls-3.8.11
-          ./configure --disable-shared --with-included-libtasn1 --without-p11-kit && make -j4
+          ./configure --disable-shared --with-included-libtasn1 --without-p11-kit --cache-file=$PWD/config.cache && make -j4
           sudo make install
       - name: Install Libtreesitter
         run: |
           curl -LO https://github.com/tree-sitter/tree-sitter/archive/refs/tags/v0.25.10.tar.gz
           tar -zxf v0.25.10.tar.gz && cd tree-sitter-0.25.10
-          make -j4
+          ./configure --cache-file=$PWD/config.cache && make -j4
           sudo make install
           sudo find /usr/local/lib -name 'libtree-sitter*.dylib' -delete
       - name: Install GNU Gzip
         run: |
           curl -LO https://ftpmirror.gnu.org/gnu/gzip/gzip-1.14.tar.gz
           tar -zxf gzip-1.14.tar.gz && cd gzip-1.14
-          ./configure && make -j4
+          ./configure --cache-file=$PWD/config.cache && make -j4
           sudo make install
       - name: Install tmate
         if: github.event_name == 'workflow_dispatch' && github.event.inputs.debug == 'true'
         run: |
           curl -LO https://github.com/tmate-io/tmate/archive/refs/tags/2.4.0.tar.gz
           tar -zxf 2.4.0.tar.gz && cd tmate-2.4.0
-          ./autogen.sh && ./configure && make -j4
+          ./autogen.sh && ./configure --cache-file=$PWD/config.cache && make -j4
           sudo make install
       - name: Setup tmate session
         if: github.event_name == 'workflow_dispatch' && github.event.inputs.debug == 'true'
