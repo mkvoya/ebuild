@@ -52,6 +52,12 @@ jobs:
           tar -zxf m4-1.4.20.tar.gz && cd m4-1.4.20
           ./configure --prefix=/usr/local/deps/m4 && make -j4
           sudo make install
+      - name: Save GNU M4 cache
+        if: steps.cache-m4.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: /usr/local/deps/m4
+          key: m4-1.4.20-${{ runner.os }}
       - name: Cache GNU Autoconf
         id: cache-autoconf
         uses: actions/cache@v4
@@ -66,6 +72,12 @@ jobs:
           tar -zxf autoconf-2.72.tar.gz && cd autoconf-2.72
           ./configure --prefix=/usr/local/deps/autoconf && make -j4
           sudo make install
+      - name: Save GNU Autoconf cache
+        if: steps.cache-autoconf.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: /usr/local/deps/autoconf
+          key: autoconf-2.72-${{ runner.os }}
       - name: Cache GNU Automake
         id: cache-automake
         uses: actions/cache@v4
@@ -80,6 +92,12 @@ jobs:
           tar -zxf automake-1.18.tar.gz && cd automake-1.18
           ./configure --prefix=/usr/local/deps/automake && make -j4
           sudo make install
+      - name: Save GNU Automake cache
+        if: steps.cache-automake.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: /usr/local/deps/automake
+          key: automake-1.18-${{ runner.os }}
       - name: Cache GNU Libtool
         id: cache-libtool
         uses: actions/cache@v4
@@ -94,6 +112,12 @@ jobs:
           tar -zxf libtool-2.5.4.tar.gz && cd libtool-2.5.4
           ./configure --prefix=/usr/local/deps/libtool --disable-shared && make -j4
           sudo make install
+      - name: Save GNU Libtool cache
+        if: steps.cache-libtool.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: /usr/local/deps/libtool
+          key: libtool-2.5.4-${{ runner.os }}
       - name: Cache Pkgconf
         id: cache-pkgconf
         uses: actions/cache@v4
@@ -109,6 +133,12 @@ jobs:
           tar -zxf pkgconf-2.5.1.tar.gz && cd pkgconf-pkgconf-2.5.1
           ./autogen.sh && ./configure --prefix=/usr/local/deps/pkgconf --disable-shared && make -j4
           sudo make install
+      - name: Save Pkgconf cache
+        if: steps.cache-pkgconf.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: /usr/local/deps/pkgconf
+          key: pkgconf-2.5.1-${{ runner.os }}
       - name: Cache GNU Texinfo
         id: cache-texinfo
         uses: actions/cache@v4
@@ -123,6 +153,12 @@ jobs:
           tar -zxf texinfo-7.2.tar.gz && cd texinfo-7.2
           ./configure --prefix=/usr/local/deps/texinfo && make -j4
           sudo make install
+      - name: Save GNU Texinfo cache
+        if: steps.cache-texinfo.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: /usr/local/deps/texinfo
+          key: texinfo-7.2-${{ runner.os }}
       - name: Cache GNU Libiconv
         id: cache-libiconv
         uses: actions/cache@v4
@@ -136,6 +172,12 @@ jobs:
           tar -zxf libiconv-1.18.tar.gz && cd libiconv-1.18
           ./configure --prefix=/usr/local/deps/libiconv --disable-shared && make -j4
           sudo make install
+      - name: Save GNU Libiconv cache
+        if: steps.cache-libiconv.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: /usr/local/deps/libiconv
+          key: libiconv-1.18-${{ runner.os }}
       - name: Cache GNU Libunistring
         id: cache-libunistring
         uses: actions/cache@v4
@@ -153,6 +195,12 @@ jobs:
           tar -zxf libunistring-1.4.1.tar.gz && cd libunistring-1.4.1
           ./configure --prefix=/usr/local/deps/libunistring --disable-shared && make -j4
           sudo make install
+      - name: Save GNU Libunistring cache
+        if: steps.cache-libunistring.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: /usr/local/deps/libunistring
+          key: libunistring-1.4.1-${{ runner.os }}
       - name: Cache GNU Gettext
         id: cache-gettext
         uses: actions/cache@v4
@@ -170,6 +218,12 @@ jobs:
           tar -zxf gettext-0.26.tar.gz && cd gettext-0.26
           ./configure --prefix=/usr/local/deps/gettext --disable-shared && make -j4
           sudo make install
+      - name: Save GNU Gettext cache
+        if: steps.cache-gettext.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: /usr/local/deps/gettext
+          key: gettext-0.26-${{ runner.os }}
       - name: Cache GNU Ncurses
         id: cache-ncurses
         uses: actions/cache@v4
@@ -185,6 +239,12 @@ jobs:
           ./configure --prefix=/usr/local/deps/ncurses --disable-shared && make -j4
           sudo make install
           sudo ln -s /usr/local/deps/ncurses/include/ncursesw/curses.h /usr/local/deps/ncurses/include/ncurses.h
+      - name: Save GNU Ncurses cache
+        if: steps.cache-ncurses.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: /usr/local/deps/ncurses
+          key: ncurses-6.5-${{ runner.os }}
       - name: Cache Zlib
         id: cache-zlib
         uses: actions/cache@v4
@@ -199,6 +259,12 @@ jobs:
           tar -zxf zlib-1.3.1.tar.gz && cd zlib-1.3.1
           ./configure --prefix=/usr/local/deps/zlib --static && make -j4
           sudo make install
+      - name: Save Zlib cache
+        if: steps.cache-zlib.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: /usr/local/deps/zlib
+          key: zlib-1.3.1-${{ runner.os }}
       - name: Cache Libxml2
         id: cache-libxml2
         uses: actions/cache@v4
@@ -216,6 +282,12 @@ jobs:
           tar -Jxf libxml2-2.9.9.tar.xz && cd libxml2-2.9.9
           ./configure --prefix=/usr/local/deps/libxml2 --disable-shared && make -j4
           sudo make install
+      - name: Save Libxml2 cache
+        if: steps.cache-libxml2.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: /usr/local/deps/libxml2
+          key: libxml2-2.9.9-${{ runner.os }}
       - name: Cache GNU Libgmp
         id: cache-gmp
         uses: actions/cache@v4
@@ -230,6 +302,12 @@ jobs:
           tar -zxf gmp-6.3.0.tar.gz && cd gmp-6.3.0
           ./configure --prefix=/usr/local/deps/gmp --disable-shared && make -j4
           sudo make install
+      - name: Save GNU Libgmp cache
+        if: steps.cache-gmp.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: /usr/local/deps/gmp
+          key: gmp-6.3.0-${{ runner.os }}
       - name: Cache Libnettle
         id: cache-nettle
         uses: actions/cache@v4
@@ -247,6 +325,12 @@ jobs:
           tar -zxf nettle-3.10.2.tar.gz && cd nettle-3.10.2
           ./configure --prefix=/usr/local/deps/nettle --disable-shared && make -j4
           sudo make install
+      - name: Save Libnettle cache
+        if: steps.cache-nettle.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: /usr/local/deps/nettle
+          key: nettle-3.10.2-${{ runner.os }}
       - name: Cache Libidn2
         id: cache-libidn2
         uses: actions/cache@v4
@@ -264,6 +348,12 @@ jobs:
           tar -zxf libidn2-2.3.8.tar.gz && cd libidn2-2.3.8
           ./configure --prefix=/usr/local/deps/libidn2 --disable-shared && make -j4
           sudo make install
+      - name: Save Libidn2 cache
+        if: steps.cache-libidn2.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: /usr/local/deps/libidn2
+          key: libidn2-2.3.8-${{ runner.os }}
       - name: Cache GnuTLS
         id: cache-gnutls
         uses: actions/cache@v4
@@ -281,6 +371,12 @@ jobs:
           tar -Jxf gnutls-3.8.11.tar.xz && cd gnutls-3.8.11
           ./configure --prefix=/usr/local/deps/gnutls --disable-shared --with-included-libtasn1 --without-p11-kit && make -j4
           sudo make install
+      - name: Save GnuTLS cache
+        if: steps.cache-gnutls.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: /usr/local/deps/gnutls
+          key: gnutls-3.8.11-${{ runner.os }}
       - name: Cache Libtreesitter
         id: cache-treesitter
         uses: actions/cache@v4
@@ -296,6 +392,12 @@ jobs:
           ./configure --prefix=/usr/local/deps/treesitter && make -j4
           sudo make install
           sudo find /usr/local/deps/treesitter/lib -name 'libtree-sitter*.dylib' -delete
+      - name: Save Libtreesitter cache
+        if: steps.cache-treesitter.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: /usr/local/deps/treesitter
+          key: treesitter-0.25.10-${{ runner.os }}
       - name: Cache GNU Gzip
         id: cache-gzip
         uses: actions/cache@v4
@@ -310,6 +412,12 @@ jobs:
           tar -zxf gzip-1.14.tar.gz && cd gzip-1.14
           ./configure --prefix=/usr/local/deps/gzip && make -j4
           sudo make install
+      - name: Save GNU Gzip cache
+        if: steps.cache-gzip.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: /usr/local/deps/gzip
+          key: gzip-1.14-${{ runner.os }}
       - name: Setup build environment
         run: |
           export PATH="/usr/local/deps/m4/bin:/usr/local/deps/autoconf/bin:/usr/local/deps/automake/bin:/usr/local/deps/libtool/bin:/usr/local/deps/pkgconf/bin:/usr/local/deps/texinfo/bin:/usr/local/deps/gzip/bin:$PATH"
