@@ -40,11 +40,6 @@ jobs:
           sudo mkdir -p /usr/local/deps
           echo "DEPS_PREFIX=/usr/local/deps" >> $GITHUB_ENV
           echo "DEPS_BASE=/usr/local/deps" >> $GITHUB_ENV
-          echo "PATH=" >> $GITHUB_ENV
-          echo "PKG_CONFIG_PATH=" >> $GITHUB_ENV
-          echo "CPPFLAGS=" >> $GITHUB_ENV
-          echo "LDFLAGS=" >> $GITHUB_ENV
-          echo "ACLOCAL_PATH=" >> $GITHUB_ENV
       - name: Cache GNU M4
         id: cache-m4
         uses: actions/cache@v4
