@@ -427,8 +427,8 @@ jobs:
         run: |
           curl -LO https://github.com/tree-sitter/tree-sitter/archive/refs/tags/v0.25.10.tar.gz
           tar -zxf v0.25.10.tar.gz && cd tree-sitter-0.25.10
-          ./configure --prefix=/usr/local/deps/treesitter && make -j4
-          sudo make install
+          make PREFIX=/usr/local/deps/treesitter -j4
+          sudo make PREFIX=/usr/local/deps/treesitter install
           sudo find /usr/local/deps/treesitter/lib -name 'libtree-sitter*.dylib' -delete
       - name: Save Libtreesitter cache
         if: steps.cache-treesitter.outputs.cache-hit != 'true'
