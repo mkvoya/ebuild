@@ -147,7 +147,9 @@ jobs:
           path: /usr/local/deps/pkgconf
           key: pkgconf-2.5.1-${{ runner.os }}
       - name: Setup Pkgconf environment
-        run: echo "PATH=/usr/local/deps/pkgconf/bin:$PATH" >> $GITHUB_ENV
+        run: |
+          echo "PATH=/usr/local/deps/pkgconf/bin:$PATH" >> $GITHUB_ENV
+          echo "PKG_CONFIG_PATH=/usr/local/deps/pkgconf/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
       - name: Cache GNU Texinfo
         id: cache-texinfo
         uses: actions/cache@v4
