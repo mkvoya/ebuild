@@ -39,11 +39,6 @@ jobs:
         run: |
           sudo mkdir -p /usr/local/deps
           sudo chmod 777 /usr/local/deps
-          # Pre-create all dependency directories with proper permissions for cache restore
-          for dir in m4 autoconf automake libtool pkgconf texinfo libiconv libunistring gettext ncurses zlib libxml2 gmp nettle libidn2 gnutls treesitter gzip openssl libevent; do
-            sudo mkdir -p /usr/local/deps/$dir
-            sudo chmod 777 /usr/local/deps/$dir
-          done
           echo "DEPS_PREFIX=/usr/local/deps" >> $GITHUB_ENV
           echo "DEPS_BASE=/usr/local/deps" >> $GITHUB_ENV
       - name: Cache GNU M4
