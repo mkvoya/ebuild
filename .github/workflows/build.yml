@@ -148,6 +148,10 @@ jobs:
           key: pkgconf-2.5.1-${{ runner.os }}
       - name: Setup Pkgconf environment
         run: |
+          # Ensure pkg-config symlink exists (for cache hits)
+          if [ ! -f /usr/local/deps/pkgconf/bin/pkg-config ]; then
+            sudo ln -sf /usr/local/deps/pkgconf/bin/pkgconf /usr/local/deps/pkgconf/bin/pkg-config
+          fi
           echo "PATH=/usr/local/deps/pkgconf/bin:$PATH" >> $GITHUB_ENV
           echo "PKG_CONFIG_PATH=/usr/local/deps/pkgconf/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
       - name: Cache GNU Texinfo
