@@ -38,6 +38,7 @@ jobs:
       - name: Setup dependencies directory
         run: |
           sudo mkdir -p /usr/local/deps
+          sudo chmod 777 /usr/local/deps
           echo "DEPS_PREFIX=/usr/local/deps" >> $GITHUB_ENV
           echo "DEPS_BASE=/usr/local/deps" >> $GITHUB_ENV
       - name: Cache GNU M4
