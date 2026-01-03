@@ -39,6 +39,11 @@ jobs:
         run: |
           sudo mkdir -p /usr/local/deps
           sudo chmod 777 /usr/local/deps
+          # Pre-create all dependency directories with proper permissions for cache restore
+          for dir in m4 autoconf automake libtool pkgconf texinfo libiconv libunistring gettext ncurses zlib libxml2 gmp nettle libidn2 gnutls treesitter gzip openssl libevent; do
+            sudo mkdir -p /usr/local/deps/$dir
+            sudo chmod 777 /usr/local/deps/$dir
+          done
           echo "DEPS_PREFIX=/usr/local/deps" >> $GITHUB_ENV
           echo "DEPS_BASE=/usr/local/deps" >> $GITHUB_ENV
       - name: Cache GNU M4
@@ -465,12 +470,55 @@ jobs:
       - name: Setup build environment
         run: |
           echo "PATH=/usr/local/bin:$PATH" >> $GITHUB_ENV
+      - name: Cache OpenSSL
+        id: cache-openssl
+        uses: actions/cache@v4
+        with:
+          path: /usr/local/deps/openssl
+          key: openssl-3.2.1-${{ runner.os }}
+      - name: Install OpenSSL
+        if: steps.cache-openssl.outputs.cache-hit != 'true'
+        run: |
+          curl -LO https://www.openssl.org/source/openssl-3.2.1.tar.gz
+          tar -zxf openssl-3.2.1.tar.gz && cd openssl-3.2.1
+          ./Configure darwin64-arm64-cc --prefix=/usr/local/deps/openssl --openssldir=/usr/local/deps/openssl no-shared
+          make -j4
+          sudo make install_sw
+      - name: Save OpenSSL cache
+        if: steps.cache-openssl.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: /usr/local/deps/openssl
+          key: openssl-3.2.1-${{ runner.os }}
+      - name: Setup OpenSSL environment
+        run: |
+          echo "PKG_CONFIG_PATH=/usr/local/deps/openssl/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
+          echo "CPPFLAGS=-I/usr/local/deps/openssl/include $CPPFLAGS" >> $GITHUB_ENV
+          echo "LDFLAGS=-L/usr/local/deps/openssl/lib $LDFLAGS" >> $GITHUB_ENV
+      - name: Cache libevent
+        id: cache-libevent
+        uses: actions/cache@v4
+        with:
+          path: /usr/local/deps/libevent
+          key: libevent-2.1.12-stable-${{ runner.os }}
       - name: Install libevent
+        if: steps.cache-libevent.outputs.cache-hit != 'true'
         run: |
           curl -LO https://github.com/libevent/libevent/releases/download/release-2.1.12-stable/libevent-2.1.12-stable.tar.gz
           tar -zxf libevent-2.1.12-stable.tar.gz && cd libevent-2.1.12-stable
-          ./configure --prefix=/usr/local && make -j4
+          ./configure --prefix=/usr/local/deps/libevent && make -j4
           sudo make install
+      - name: Save libevent cache
+        if: steps.cache-libevent.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: /usr/local/deps/libevent
+          key: libevent-2.1.12-stable-${{ runner.os }}
+      - name: Setup libevent environment
+        run: |
+          echo "PKG_CONFIG_PATH=/usr/local/deps/libevent/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
+          echo "CPPFLAGS=-I/usr/local/deps/libevent/include $CPPFLAGS" >> $GITHUB_ENV
+          echo "LDFLAGS=-L/usr/local/deps/libevent/lib $LDFLAGS" >> $GITHUB_ENV
       - name: Install tmate
         if: github.event_name == 'workflow_dispatch' && github.event.inputs.debug == 'true'
         run: |
