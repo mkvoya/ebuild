@@ -792,6 +792,21 @@ jobs:
           cmake -DCMAKE_INSTALL_PREFIX=/usr/local/deps/msgpack -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF .
           make -j4
           sudo make install
+          # msgpack-c cmake doesn't install pkg-config file, create it manually
+          # msgpack-c 6.x uses cmake and the library is named msgpackc
+          sudo mkdir -p /usr/local/deps/msgpack/lib/pkgconfig
+          sudo tee /usr/local/deps/msgpack/lib/pkgconfig/msgpack.pc > /dev/null <<EOF
+          prefix=/usr/local/deps/msgpack
+          exec_prefix=\${prefix}
+          includedir=\${prefix}/include
+          libdir=\${exec_prefix}/lib
+
+          Name: msgpack
+          Description: MessagePack is a binary-based efficient data interchange format
+          Version: 6.1.0
+          Cflags: -I\${includedir}
+          Libs: -L\${libdir} -lmsgpackc
+          EOF
       - name: Save msgpack cache
         if: github.event_name == 'workflow_dispatch' && github.event.inputs.debug == 'true' && steps.cache-msgpack.outputs.cache-hit != 'true'
         uses: actions/cache/save@v4
