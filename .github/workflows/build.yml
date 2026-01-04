@@ -819,6 +819,34 @@ jobs:
           echo "PKG_CONFIG_PATH=/usr/local/deps/msgpack/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
           echo "CPPFLAGS=-I/usr/local/deps/msgpack/include $CPPFLAGS" >> $GITHUB_ENV
           echo "LDFLAGS=-L/usr/local/deps/msgpack/lib $LDFLAGS" >> $GITHUB_ENV
+      - name: Cache libssh
+        id: cache-libssh
+        if: github.event_name == 'workflow_dispatch' && github.event.inputs.debug == 'true'
+        uses: actions/cache@v4
+        with:
+          path: /usr/local/deps/libssh
+          key: libssh-0.11.3-${{ runner.os }}
+      - name: Install libssh
+        if: github.event_name == 'workflow_dispatch' && github.event.inputs.debug == 'true' && steps.cache-libssh.outputs.cache-hit != 'true'
+        run: |
+          curl -LO https://www.libssh.org/files/0.11/libssh-0.11.3.tar.xz 
+          tar -Jxf libssh-0.11.3.tar.xz && cd libssh-0.11.3
+          mkdir build && cd build
+          cmake -DCMAKE_INSTALL_PREFIX=/usr/local/deps/libssh -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF -DWITH_SERVER=OFF -DWITH_EXAMPLES=OFF ..
+          make -j4
+          sudo make install
+      - name: Save libssh cache
+        if: github.event_name == 'workflow_dispatch' && github.event.inputs.debug == 'true' && steps.cache-libssh.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: /usr/local/deps/libssh
+          key: libssh-0.11.3-${{ runner.os }}
+      - name: Setup libssh environment
+        if: github.event_name == 'workflow_dispatch' && github.event.inputs.debug == 'true'
+        run: |
+          echo "PKG_CONFIG_PATH=/usr/local/deps/libssh/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
+          echo "CPPFLAGS=-I/usr/local/deps/libssh/include $CPPFLAGS" >> $GITHUB_ENV
+          echo "LDFLAGS=-L/usr/local/deps/libssh/lib $LDFLAGS" >> $GITHUB_ENV
       - name: Install tmate
         if: github.event_name == 'workflow_dispatch' && github.event.inputs.debug == 'true'
         run: |
