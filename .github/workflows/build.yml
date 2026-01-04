@@ -611,8 +611,9 @@ jobs:
         run: |
           curl -L https://sourceforge.net/projects/giflib/files/giflib-5.2.2.tar.gz/download -o giflib-5.2.2.tar.gz
           tar -zxf giflib-5.2.2.tar.gz && cd giflib-5.2.2
-          ./configure --prefix=/usr/local/deps/libgif --disable-shared && make -j4
-          sudo make install
+          make PREFIX=/usr/local/deps/libgif -j4
+          sudo make PREFIX=/usr/local/deps/libgif install
+          sudo find /usr/local/deps/libgif/lib -name 'libgif*.dylib' -delete
       - name: Save libgif cache
         if: steps.cache-libgif.outputs.cache-hit != 'true'
         uses: actions/cache/save@v4
@@ -793,7 +794,7 @@ jobs:
           # This will output the SSH connection string that you can use to connect
           # Use default server (ssh://uptermd.upterm.dev:22) or specify with protocol
           echo "Starting upterm session..."
-          upterm host --accept -- bash -l
+          upterm host --accept --skip-host-key-check -- bash -l
       - name: Build Emacs
         run: |
           git clone --depth 1 https://github.com/emacs-mirror/emacs.git
