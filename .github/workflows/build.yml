@@ -861,7 +861,24 @@ jobs:
           fi
           # Run autoupdate to fix obsolete macros
           autoupdate || true
-          ./autogen.sh && ./configure && make -j4
+          ./autogen.sh
+          # Fix compat.h conflict with macOS strlcpy/strlcat macros
+          # macOS defines these as macros, so we need to undefine them before compat.h declares them
+          if ! grep -q "#undef strlcpy" compat.h; then
+            sed -i '' '/^size_t.*strlcpy/i\
+          #ifdef strlcpy\
+          #undef strlcpy\
+          #endif
+          ' compat.h
+          fi
+          if ! grep -q "#undef strlcat" compat.h; then
+            sed -i '' '/^size_t.*strlcat/i\
+          #ifdef strlcat\
+          #undef strlcat\
+          #endif
+          ' compat.h
+          fi
+          ./configure CFLAGS="-D_DARWIN_C_SOURCE $CFLAGS" && make -j4
           sudo make install
       - name: Setup tmate session
         if: github.event_name == 'workflow_dispatch' && github.event.inputs.debug == 'true'
