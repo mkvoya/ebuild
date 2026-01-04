@@ -765,7 +765,7 @@ jobs:
         run: |
           curl -LO https://github.com/tmux/tmux/releases/download/3.6/tmux-3.6.tar.gz
           tar -zxf tmux-3.6.tar.gz && cd tmux-3.6
-          ./configure --prefix=/usr/local/deps/tmux && make -j4
+          ./configure --prefix=/usr/local/deps/tmux --enable-utf8proc && make -j4
           sudo make install
       - name: Save tmux cache
         if: github.event_name == 'workflow_dispatch' && (github.event.inputs.debug == 'true' || github.event.inputs.early-debug == 'true') && steps.cache-tmux.outputs.cache-hit != 'true'
