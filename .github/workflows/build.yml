@@ -534,36 +534,6 @@ jobs:
           echo "PKG_CONFIG_PATH=/usr/local/deps/libevent/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
           echo "CPPFLAGS=-I/usr/local/deps/libevent/include $CPPFLAGS" >> $GITHUB_ENV
           echo "LDFLAGS=-L/usr/local/deps/libevent/lib $LDFLAGS" >> $GITHUB_ENV
-      - name: Cache tmux
-        id: cache-tmux
-        if: github.event_name == 'workflow_dispatch' && (github.event.inputs.debug == 'true' || github.event.inputs.early-debug == 'true')
-        uses: actions/cache@v4
-        with:
-          path: /usr/local/deps/tmux
-          key: tmux-3.4-${{ runner.os }}
-      - name: Install tmux
-        if: github.event_name == 'workflow_dispatch' && (github.event.inputs.debug == 'true' || github.event.inputs.early-debug == 'true') && steps.cache-tmux.outputs.cache-hit != 'true'
-        run: |
-          curl -LO https://github.com/tmux/tmux/releases/download/3.4/tmux-3.4.tar.gz
-          tar -zxf tmux-3.4.tar.gz && cd tmux-3.4
-          # Build static tmux using already installed libevent and ncurses
-          ./configure --prefix=/usr/local/deps/tmux \
-                      CPPFLAGS="$CPPFLAGS" \
-                      LDFLAGS="$LDFLAGS" \
-                      PKG_CONFIG_PATH="$PKG_CONFIG_PATH" \
-                      --enable-static \
-                      --disable-shared
-          make -j4
-          sudo make install
-      - name: Save tmux cache
-        if: github.event_name == 'workflow_dispatch' && (github.event.inputs.debug == 'true' || github.event.inputs.early-debug == 'true') && steps.cache-tmux.outputs.cache-hit != 'true'
-        uses: actions/cache/save@v4
-        with:
-          path: /usr/local/deps/tmux
-          key: tmux-3.4-${{ runner.os }}
-      - name: Setup tmux environment
-        if: github.event_name == 'workflow_dispatch' && (github.event.inputs.debug == 'true' || github.event.inputs.early-debug == 'true')
-        run: echo "PATH=/usr/local/deps/tmux/bin:$PATH" >> $GITHUB_ENV
       - name: Cache libjpeg
         id: cache-libjpeg
         uses: actions/cache@v4
@@ -783,6 +753,29 @@ jobs:
           echo "LDFLAGS=-L/usr/local/deps/imagemagick/lib $LDFLAGS" >> $GITHUB_ENV
           echo "MAGICK_CFLAGS=-I/usr/local/deps/imagemagick/include/ImageMagick-7" >> $GITHUB_ENV
           echo "MAGICK_LIBS=-L/usr/local/deps/imagemagick/lib -lMagickWand-7 -lMagickCore-7" >> $GITHUB_ENV
+      - name: Cache tmux
+        id: cache-tmux
+        if: github.event_name == 'workflow_dispatch' && (github.event.inputs.debug == 'true' || github.event.inputs.early-debug == 'true')
+        uses: actions/cache@v4
+        with:
+          path: /usr/local/deps/tmux
+          key: tmux-3.6-${{ runner.os }}
+      - name: Install tmux
+        if: github.event_name == 'workflow_dispatch' && (github.event.inputs.debug == 'true' || github.event.inputs.early-debug == 'true') && steps.cache-tmux.outputs.cache-hit != 'true'
+        run: |
+          curl -LO https://github.com/tmux/tmux/releases/download/3.6/tmux-3.6.tar.gz
+          tar -zxf tmux-3.6.tar.gz && cd tmux-3.6
+          ./configure --prefix=/usr/local/deps/tmux && make -j4
+          sudo make install
+      - name: Save tmux cache
+        if: github.event_name == 'workflow_dispatch' && (github.event.inputs.debug == 'true' || github.event.inputs.early-debug == 'true') && steps.cache-tmux.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: /usr/local/deps/tmux
+          key: tmux-3.6-${{ runner.os }}
+      - name: Setup tmux environment
+        if: github.event_name == 'workflow_dispatch' && (github.event.inputs.debug == 'true' || github.event.inputs.early-debug == 'true')
+        run: echo "PATH=/usr/local/deps/tmux/bin:$PATH" >> $GITHUB_ENV
       - name: Setup upterm session
         if: github.event_name == 'workflow_dispatch' && github.event.inputs.debug == 'true'
         uses: owenthereal/action-upterm@v1
