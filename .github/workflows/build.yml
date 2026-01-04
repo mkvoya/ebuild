@@ -687,7 +687,7 @@ jobs:
           mkdir -p _build
           meson setup _build --prefix=/usr/local/deps/freetype
           meson compile -C _build
-          meson install -C _build --prefix=/usr/local/deps/freetype
+          meson install -C _build
       - name: Save FreeType2 cache
         if: steps.cache-freetype.outputs.cache-hit != 'true'
         uses: actions/cache/save@v4
@@ -713,7 +713,7 @@ jobs:
           mkdir -p _build
           meson setup _build --prefix=/usr/local/deps/pango
           meson compile -C _build
-          meson install -C _build --prefix=/usr/local/deps/pango
+          meson install -C _build
       - name: Save Pango cache
         if: steps.cache-pango.outputs.cache-hit != 'true'
         uses: actions/cache/save@v4
@@ -736,10 +736,10 @@ jobs:
         run: |
           curl -LO https://cairographics.org/releases/cairo-1.18.4.tar.xz
           tar -Jxf cairo-1.18.4.tar.xz && cd cairo-1.18.4
-          mkdir _build
-          meson setup _build 
-          ninja -C _build
-          ninja -C _build install --prefix=/usr/local/deps/cairo
+          mkdir -p _build
+          meson setup _build --prefix=/usr/local/deps/cairo
+          meson compile -C _build
+          meson install -C _build
       - name: Save Cairo cache
         if: steps.cache-cairo.outputs.cache-hit != 'true'
         uses: actions/cache/save@v4
@@ -772,7 +772,7 @@ jobs:
           mkdir -p _build
           meson setup _build --prefix=/usr/local/deps/librsvg -Ddocs=disabled -Dintrospection=disabled -Dvala=disabled
           meson compile -C _build
-          meson install -C _build --prefix=/usr/local/deps/librsvg
+          meson install -C _build
       - name: Save librsvg cache
         if: steps.cache-librsvg.outputs.cache-hit != 'true'
         uses: actions/cache/save@v4
