@@ -519,12 +519,12 @@ jobs:
         uses: actions/cache@v4
         with:
           path: /usr/local/deps/libjpeg
-          key: libjpeg-9e-${{ runner.os }}
+          key: libjpeg-9f-${{ runner.os }}
       - name: Install libjpeg
         if: steps.cache-libjpeg.outputs.cache-hit != 'true'
         run: |
-          curl -LO https://github.com/thorfdbg/libjpeg/archive/refs/tags/v9e.tar.gz
-          tar -zxf v9e.tar.gz && cd libjpeg-9e
+          curl -LO https://www.ijg.org/files/jpegsrc.v9f.tar.gz
+          tar -zxf jpegsrc.v9f.tar.gz && cd jpeg-9f
           ./configure --prefix=/usr/local/deps/libjpeg --disable-shared && make -j4
           sudo make install
       - name: Save libjpeg cache
@@ -532,7 +532,7 @@ jobs:
         uses: actions/cache/save@v4
         with:
           path: /usr/local/deps/libjpeg
-          key: libjpeg-9e-${{ runner.os }}
+          key: libjpeg-9f-${{ runner.os }}
       - name: Setup libjpeg environment
         run: |
           echo "PKG_CONFIG_PATH=/usr/local/deps/libjpeg/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
@@ -543,12 +543,12 @@ jobs:
         uses: actions/cache@v4
         with:
           path: /usr/local/deps/libtiff
-          key: libtiff-4.6.0-${{ runner.os }}
+          key: libtiff-4.7.1-${{ runner.os }}
       - name: Install libtiff
         if: steps.cache-libtiff.outputs.cache-hit != 'true'
         run: |
-          curl -LO https://download.osgeo.org/libtiff/tiff-4.6.0.tar.gz
-          tar -zxf tiff-4.6.0.tar.gz && cd tiff-4.6.0
+          curl -LO https://download.osgeo.org/libtiff/tiff-4.7.1.tar.gz
+          tar -zxf tiff-4.7.1.tar.gz && cd tiff-4.7.1
           ./configure --prefix=/usr/local/deps/libtiff --disable-shared && make -j4
           sudo make install
       - name: Save libtiff cache
@@ -556,7 +556,7 @@ jobs:
         uses: actions/cache/save@v4
         with:
           path: /usr/local/deps/libtiff
-          key: libtiff-4.6.0-${{ runner.os }}
+          key: libtiff-4.7.1-${{ runner.os }}
       - name: Setup libtiff environment
         run: |
           echo "PKG_CONFIG_PATH=/usr/local/deps/libtiff/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
@@ -591,12 +591,12 @@ jobs:
         uses: actions/cache@v4
         with:
           path: /usr/local/deps/libpng
-          key: libpng-1.6.43-${{ runner.os }}
+          key: libpng-1.6.53-${{ runner.os }}
       - name: Install libpng
         if: steps.cache-libpng.outputs.cache-hit != 'true'
         run: |
-          curl -LO https://sourceforge.net/projects/libpng/files/libpng16/1.6.43/libpng-1.6.43.tar.gz/download -o libpng-1.6.43.tar.gz
-          tar -zxf libpng-1.6.43.tar.gz && cd libpng-1.6.43
+          curl -LO https://sourceforge.net/projects/libpng/files/libpng16/1.6.53/libpng-1.6.53.tar.gz/download -o libpng-1.6.53.tar.gz
+          tar -zxf libpng-1.6.53.tar.gz && cd libpng-1.6.53
           ./configure --prefix=/usr/local/deps/libpng --disable-shared && make -j4
           sudo make install
       - name: Save libpng cache
@@ -604,7 +604,7 @@ jobs:
         uses: actions/cache/save@v4
         with:
           path: /usr/local/deps/libpng
-          key: libpng-1.6.43-${{ runner.os }}
+          key: libpng-1.6.53-${{ runner.os }}
       - name: Setup libpng environment
         run: |
           echo "PKG_CONFIG_PATH=/usr/local/deps/libpng/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
@@ -615,12 +615,12 @@ jobs:
         uses: actions/cache@v4
         with:
           path: /usr/local/deps/librsvg
-          key: librsvg-2.57.3-${{ runner.os }}
+          key: librsvg-2.60.1-${{ runner.os }}
       - name: Install librsvg
         if: steps.cache-librsvg.outputs.cache-hit != 'true'
         run: |
-          curl -LO https://download.gnome.org/sources/librsvg/2.57/librsvg-2.57.3.tar.xz
-          tar -Jxf librsvg-2.57.3.tar.xz && cd librsvg-2.57.3
+          curl -LO https://download.gnome.org/sources/librsvg/2.60/librsvg-2.60.1.tar.xz
+          tar -Jxf librsvg-2.60.1.tar.xz && cd librsvg-2.60.1
           ./configure --prefix=/usr/local/deps/librsvg --disable-shared && make -j4
           sudo make install
       - name: Save librsvg cache
@@ -628,7 +628,7 @@ jobs:
         uses: actions/cache/save@v4
         with:
           path: /usr/local/deps/librsvg
-          key: librsvg-2.57.3-${{ runner.os }}
+          key: librsvg-2.60.1-${{ runner.os }}
       - name: Setup librsvg environment
         run: |
           echo "PKG_CONFIG_PATH=/usr/local/deps/librsvg/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
@@ -639,12 +639,12 @@ jobs:
         uses: actions/cache@v4
         with:
           path: /usr/local/deps/libwebp
-          key: libwebp-1.4.0-${{ runner.os }}
+          key: libwebp-1.6.0-${{ runner.os }}
       - name: Install libwebp
         if: steps.cache-libwebp.outputs.cache-hit != 'true'
         run: |
-          curl -LO https://storage.googleapis.com/downloads.webmproject.org/releases/webp/libwebp-1.4.0.tar.gz
-          tar -zxf libwebp-1.4.0.tar.gz && cd libwebp-1.4.0
+          curl -LO https://storage.googleapis.com/downloads.webmproject.org/releases/webp/libwebp-1.6.0.tar.gz
+          tar -zxf libwebp-1.6.0.tar.gz && cd libwebp-1.6.0
           ./configure --prefix=/usr/local/deps/libwebp --disable-shared && make -j4
           sudo make install
       - name: Save libwebp cache
@@ -652,7 +652,7 @@ jobs:
         uses: actions/cache/save@v4
         with:
           path: /usr/local/deps/libwebp
-          key: libwebp-1.4.0-${{ runner.os }}
+          key: libwebp-1.6.0-${{ runner.os }}
       - name: Setup libwebp environment
         run: |
           echo "PKG_CONFIG_PATH=/usr/local/deps/libwebp/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
@@ -663,12 +663,12 @@ jobs:
         uses: actions/cache@v4
         with:
           path: /usr/local/deps/sqlite3
-          key: sqlite3-3.45.3-${{ runner.os }}
+          key: sqlite3-3.51.1-${{ runner.os }}
       - name: Install SQLite3
         if: steps.cache-sqlite3.outputs.cache-hit != 'true'
         run: |
-          curl -LO https://www.sqlite.org/2024/sqlite-autoconf-3450300.tar.gz
-          tar -zxf sqlite-autoconf-3450300.tar.gz && cd sqlite-autoconf-3450300
+          curl -LO https://sqlite.org/2025/sqlite-autoconf-3510100.tar.gz
+          tar -zxf sqlite-autoconf-3510100.tar.gz && cd sqlite-autoconf-3510100
           ./configure --prefix=/usr/local/deps/sqlite3 --disable-shared && make -j4
           sudo make install
       - name: Save SQLite3 cache
@@ -676,7 +676,7 @@ jobs:
         uses: actions/cache/save@v4
         with:
           path: /usr/local/deps/sqlite3
-          key: sqlite3-3.45.3-${{ runner.os }}
+          key: sqlite3-3.51.1-${{ runner.os }}
       - name: Setup SQLite3 environment
         run: |
           echo "PKG_CONFIG_PATH=/usr/local/deps/sqlite3/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
@@ -687,12 +687,12 @@ jobs:
         uses: actions/cache@v4
         with:
           path: /usr/local/deps/lcms2
-          key: lcms2-2.16-${{ runner.os }}
+          key: lcms2-2.17-${{ runner.os }}
       - name: Install lcms2
         if: steps.cache-lcms2.outputs.cache-hit != 'true'
         run: |
-          curl -LO https://github.com/mm2/Little-CMS/releases/download/lcms2.16/lcms2-2.16.tar.gz
-          tar -zxf lcms2-2.16.tar.gz && cd lcms2-2.16
+          curl -LO https://github.com/mm2/Little-CMS/releases/download/lcms2.17/lcms2-2.17.tar.gz
+          tar -zxf lcms2-2.17.tar.gz && cd lcms2-2.17
           ./configure --prefix=/usr/local/deps/lcms2 --disable-shared && make -j4
           sudo make install
       - name: Save lcms2 cache
@@ -700,7 +700,7 @@ jobs:
         uses: actions/cache/save@v4
         with:
           path: /usr/local/deps/lcms2
-          key: lcms2-2.16-${{ runner.os }}
+          key: lcms2-2.17-${{ runner.os }}
       - name: Setup lcms2 environment
         run: |
           echo "PKG_CONFIG_PATH=/usr/local/deps/lcms2/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
@@ -711,12 +711,12 @@ jobs:
         uses: actions/cache@v4
         with:
           path: /usr/local/deps/imagemagick
-          key: imagemagick-7.1.1-30-${{ runner.os }}
+          key: imagemagick-7.1.2-12-${{ runner.os }}
       - name: Install ImageMagick
         if: steps.cache-imagemagick.outputs.cache-hit != 'true'
         run: |
-          curl -LO https://github.com/ImageMagick/ImageMagick/archive/refs/tags/7.1.1-30.tar.gz
-          tar -zxf 7.1.1-30.tar.gz && cd ImageMagick-7.1.1-30
+          curl -LO https://github.com/ImageMagick/ImageMagick/archive/refs/tags/7.1.2-12.tar.gz
+          tar -zxf 7.1.2-12.tar.gz && cd ImageMagick-7.1.2-12
           ./configure --prefix=/usr/local/deps/imagemagick --disable-shared --without-x --without-perl --without-xml && make -j4
           sudo make install
       - name: Save ImageMagick cache
@@ -724,7 +724,7 @@ jobs:
         uses: actions/cache/save@v4
         with:
           path: /usr/local/deps/imagemagick
-          key: imagemagick-7.1.1-30-${{ runner.os }}
+          key: imagemagick-7.1.2-12-${{ runner.os }}
       - name: Setup ImageMagick environment
         run: |
           echo "PKG_CONFIG_PATH=/usr/local/deps/imagemagick/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
