@@ -787,8 +787,8 @@ jobs:
       - name: Install msgpack
         if: github.event_name == 'workflow_dispatch' && github.event.inputs.debug == 'true' && steps.cache-msgpack.outputs.cache-hit != 'true'
         run: |
-          curl -LO https://github.com/msgpack/msgpack-c/releases/download/c-6.1.0/msgpack-6.1.0.tar.gz
-          tar -zxf msgpack-6.1.0.tar.gz && cd msgpack-6.1.0
+          curl -LO https://github.com/msgpack/msgpack-c/releases/download/c-6.1.0/msgpack-c-6.1.0.tar.gz
+          tar -zxf msgpack-c-6.1.0.tar.gz && cd msgpack-c-6.1.0
           cmake -DCMAKE_INSTALL_PREFIX=/usr/local/deps/msgpack -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF .
           make -j4
           sudo make install
