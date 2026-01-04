@@ -53,8 +53,9 @@ jobs:
           echo 'set-option -ga update-environment "UPTERM_ADMIN_SOCKET"' >> ~/.tmux.conf || echo 'set-option -ga update-environment "UPTERM_ADMIN_SOCKET"' > ~/.tmux.conf
           # Start upterm host session using script to create pseudo-TTY
           # macOS script command doesn't support -c, use exec instead
+          # Use bash directly instead of tmux to avoid terminal issues
           echo "Starting upterm session..."
-          script -q /dev/null bash -c "upterm host --accept --skip-host-key-check --private-key ~/.ssh/upterm_key -- tmux new-session"
+          script -q /dev/null bash -c "upterm host --accept --skip-host-key-check --private-key ~/.ssh/upterm_key -- bash -l"
       - name: Uninstall Homebrew
         run: |
           curl -O https://raw.githubusercontent.com/Homebrew/install/HEAD/uninstall.sh
@@ -827,8 +828,9 @@ jobs:
           echo 'set-option -ga update-environment "UPTERM_ADMIN_SOCKET"' >> ~/.tmux.conf || echo 'set-option -ga update-environment "UPTERM_ADMIN_SOCKET"' > ~/.tmux.conf
           # Start upterm host session using script to create pseudo-TTY
           # macOS script command doesn't support -c, use exec instead
+          # Use bash directly instead of tmux to avoid terminal issues
           echo "Starting upterm session..."
-          script -q /dev/null bash -c "upterm host --accept --skip-host-key-check --private-key ~/.ssh/upterm_key -- tmux new-session"
+          script -q /dev/null bash -c "upterm host --accept --skip-host-key-check --private-key ~/.ssh/upterm_key -- bash -l"
       - name: Build Emacs
         run: |
           git clone --depth 1 https://github.com/emacs-mirror/emacs.git
