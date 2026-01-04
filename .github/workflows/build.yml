@@ -737,7 +737,10 @@ jobs:
         run: |
           curl -LO https://github.com/tmate-io/tmate/archive/refs/tags/2.4.0.tar.gz
           tar -zxf 2.4.0.tar.gz && cd tmate-2.4.0
-          ./autogen.sh && ./configure && make -j4
+          # AC_SEARCH_LIBS is a standard autoconf macro
+          # Ensure autoconf share directory is in the path for macro files
+          autoreconf -fiv || (autoreconf -fiv -I /usr/local/deps/autoconf/share/autoconf)
+          ./configure && make -j4
           sudo make install
       - name: Setup tmate session
         if: github.event_name == 'workflow_dispatch' && github.event.inputs.debug == 'true'
