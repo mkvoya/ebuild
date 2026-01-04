@@ -752,6 +752,33 @@ jobs:
           echo "LDFLAGS=-L/usr/local/deps/imagemagick/lib $LDFLAGS" >> $GITHUB_ENV
           echo "MAGICK_CFLAGS=-I/usr/local/deps/imagemagick/include/ImageMagick-7" >> $GITHUB_ENV
           echo "MAGICK_LIBS=-L/usr/local/deps/imagemagick/lib -lMagickWand-7 -lMagickCore-7" >> $GITHUB_ENV
+      - name: Cache msgpack
+        id: cache-msgpack
+        if: github.event_name == 'workflow_dispatch' && github.event.inputs.debug == 'true'
+        uses: actions/cache@v4
+        with:
+          path: /usr/local/deps/msgpack
+          key: msgpack-6.1.0-${{ runner.os }}
+      - name: Install msgpack
+        if: github.event_name == 'workflow_dispatch' && github.event.inputs.debug == 'true' && steps.cache-msgpack.outputs.cache-hit != 'true'
+        run: |
+          curl -LO https://github.com/msgpack/msgpack-c/releases/download/c-6.1.0/msgpack-6.1.0.tar.gz
+          tar -zxf msgpack-6.1.0.tar.gz && cd msgpack-6.1.0
+          cmake -DCMAKE_INSTALL_PREFIX=/usr/local/deps/msgpack -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF .
+          make -j4
+          sudo make install
+      - name: Save msgpack cache
+        if: github.event_name == 'workflow_dispatch' && github.event.inputs.debug == 'true' && steps.cache-msgpack.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: /usr/local/deps/msgpack
+          key: msgpack-6.1.0-${{ runner.os }}
+      - name: Setup msgpack environment
+        if: github.event_name == 'workflow_dispatch' && github.event.inputs.debug == 'true'
+        run: |
+          echo "PKG_CONFIG_PATH=/usr/local/deps/msgpack/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
+          echo "CPPFLAGS=-I/usr/local/deps/msgpack/include $CPPFLAGS" >> $GITHUB_ENV
+          echo "LDFLAGS=-L/usr/local/deps/msgpack/lib $LDFLAGS" >> $GITHUB_ENV
       - name: Install tmate
         if: github.event_name == 'workflow_dispatch' && github.event.inputs.debug == 'true'
         run: |
