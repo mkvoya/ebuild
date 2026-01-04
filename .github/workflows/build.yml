@@ -658,6 +658,78 @@ jobs:
           echo "PKG_CONFIG_PATH=/usr/local/deps/libwebp/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
           echo "CPPFLAGS=-I/usr/local/deps/libwebp/include $CPPFLAGS" >> $GITHUB_ENV
           echo "LDFLAGS=-L/usr/local/deps/libwebp/lib $LDFLAGS" >> $GITHUB_ENV
+      - name: Cache SQLite3
+        id: cache-sqlite3
+        uses: actions/cache@v4
+        with:
+          path: /usr/local/deps/sqlite3
+          key: sqlite3-3.45.3-${{ runner.os }}
+      - name: Install SQLite3
+        if: steps.cache-sqlite3.outputs.cache-hit != 'true'
+        run: |
+          curl -LO https://www.sqlite.org/2024/sqlite-autoconf-3450300.tar.gz
+          tar -zxf sqlite-autoconf-3450300.tar.gz && cd sqlite-autoconf-3450300
+          ./configure --prefix=/usr/local/deps/sqlite3 --disable-shared && make -j4
+          sudo make install
+      - name: Save SQLite3 cache
+        if: steps.cache-sqlite3.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: /usr/local/deps/sqlite3
+          key: sqlite3-3.45.3-${{ runner.os }}
+      - name: Setup SQLite3 environment
+        run: |
+          echo "PKG_CONFIG_PATH=/usr/local/deps/sqlite3/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
+          echo "CPPFLAGS=-I/usr/local/deps/sqlite3/include $CPPFLAGS" >> $GITHUB_ENV
+          echo "LDFLAGS=-L/usr/local/deps/sqlite3/lib $LDFLAGS" >> $GITHUB_ENV
+      - name: Cache lcms2
+        id: cache-lcms2
+        uses: actions/cache@v4
+        with:
+          path: /usr/local/deps/lcms2
+          key: lcms2-2.16-${{ runner.os }}
+      - name: Install lcms2
+        if: steps.cache-lcms2.outputs.cache-hit != 'true'
+        run: |
+          curl -LO https://github.com/mm2/Little-CMS/releases/download/lcms2.16/lcms2-2.16.tar.gz
+          tar -zxf lcms2-2.16.tar.gz && cd lcms2-2.16
+          ./configure --prefix=/usr/local/deps/lcms2 --disable-shared && make -j4
+          sudo make install
+      - name: Save lcms2 cache
+        if: steps.cache-lcms2.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: /usr/local/deps/lcms2
+          key: lcms2-2.16-${{ runner.os }}
+      - name: Setup lcms2 environment
+        run: |
+          echo "PKG_CONFIG_PATH=/usr/local/deps/lcms2/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
+          echo "CPPFLAGS=-I/usr/local/deps/lcms2/include $CPPFLAGS" >> $GITHUB_ENV
+          echo "LDFLAGS=-L/usr/local/deps/lcms2/lib $LDFLAGS" >> $GITHUB_ENV
+      - name: Cache ImageMagick
+        id: cache-imagemagick
+        uses: actions/cache@v4
+        with:
+          path: /usr/local/deps/imagemagick
+          key: imagemagick-7.1.1-30-${{ runner.os }}
+      - name: Install ImageMagick
+        if: steps.cache-imagemagick.outputs.cache-hit != 'true'
+        run: |
+          curl -LO https://github.com/ImageMagick/ImageMagick/archive/refs/tags/7.1.1-30.tar.gz
+          tar -zxf 7.1.1-30.tar.gz && cd ImageMagick-7.1.1-30
+          ./configure --prefix=/usr/local/deps/imagemagick --disable-shared --without-x --without-perl --without-xml && make -j4
+          sudo make install
+      - name: Save ImageMagick cache
+        if: steps.cache-imagemagick.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: /usr/local/deps/imagemagick
+          key: imagemagick-7.1.1-30-${{ runner.os }}
+      - name: Setup ImageMagick environment
+        run: |
+          echo "PKG_CONFIG_PATH=/usr/local/deps/imagemagick/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
+          echo "CPPFLAGS=-I/usr/local/deps/imagemagick/include $CPPFLAGS" >> $GITHUB_ENV
+          echo "LDFLAGS=-L/usr/local/deps/imagemagick/lib $LDFLAGS" >> $GITHUB_ENV
       - name: Install tmate
         if: github.event_name == 'workflow_dispatch' && github.event.inputs.debug == 'true'
         run: |
@@ -688,13 +760,16 @@ jobs:
                                       --with-gif                    \
                                       --with-gmp                    \
                                       --with-gnutls                 \
+                                      --with-imagemagick            \
                                       --with-jpeg                   \
+                                      --with-lcms2                  \
                                       --with-modules                \
                                       --with-native-image-api       \
                                       --with-ns                     \
                                       --with-png                    \
                                       --with-rsvg                   \
                                       --with-small-ja-dic           \
+                                      --with-sqlite3                \
                                       --with-threads                \
                                       --with-tiff                   \
                                       --with-toolkit-scroll-bars    \
@@ -721,7 +796,9 @@ jobs:
                                       --with-gif                    \
                                       --with-gmp                    \
                                       --with-gnutls                 \
+                                      --with-imagemagick            \
                                       --with-jpeg                   \
+                                      --with-lcms2                  \
                                       --with-modules                \
                                       --with-mps                    \
                                       --with-native-image-api       \
@@ -729,6 +806,7 @@ jobs:
                                       --with-png                    \
                                       --with-rsvg                   \
                                       --with-small-ja-dic           \
+                                      --with-sqlite3                \
                                       --with-threads                \
                                       --with-tiff                   \
                                       --with-toolkit-scroll-bars    \
