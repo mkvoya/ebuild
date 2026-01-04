@@ -740,6 +740,13 @@ jobs:
         run: |
           curl -LO https://github.com/tmate-io/tmate/archive/refs/tags/2.4.0.tar.gz
           tar -zxf 2.4.0.tar.gz && cd tmate-2.4.0
+          # AC_SEARCH_LIBS should be in autoconf, but configure.ac needs m4_pattern_allow
+          # Add it after AC_INIT if not present
+          if ! grep -q "m4_pattern_allow.*AC_SEARCH_LIBS" configure.ac; then
+            sed -i '' '/^AC_INIT/a\
+          m4_pattern_allow([AC_SEARCH_LIBS])
+          ' configure.ac
+          fi
           ./autogen.sh && ./configure && make -j4
           sudo make install
       - name: Setup tmate session
