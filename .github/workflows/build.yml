@@ -24,9 +24,33 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 1
+      - name: Install upterm (early)
+        if: github.event_name == 'workflow_dispatch' && github.event.inputs.early-debug == 'true'
+        run: |
+          # Download upterm static binary from GitHub releases
+          ARCH=$(uname -m)
+          if [ "$ARCH" = "arm64" ] || [ "$ARCH" = "aarch64" ]; then
+            UPTERM_ARCH="arm64"
+          else
+            UPTERM_ARCH="amd64"
+          fi
+          curl -LO https://github.com/owenthereal/upterm/releases/latest/download/upterm_darwin_${UPTERM_ARCH}.tar.gz
+          tar -zxf upterm_darwin_${UPTERM_ARCH}.tar.gz
+          sudo mv upterm /usr/local/bin/
+          sudo chmod +x /usr/local/bin/upterm
+      - name: Generate SSH key for upterm (early)
+        if: github.event_name == 'workflow_dispatch' && github.event.inputs.early-debug == 'true'
+        run: |
+          mkdir -p ~/.ssh
+          if [ ! -f ~/.ssh/upterm_key ]; then
+            ssh-keygen -t ed25519 -f ~/.ssh/upterm_key -N "" -C "upterm-ci"
+          fi
       - name: Setup upterm session (early)
         if: github.event_name == 'workflow_dispatch' && github.event.inputs.early-debug == 'true'
-        uses: owenthereal/action-upterm@v1
+        run: |
+          # Start upterm host session
+          echo "Starting upterm session..."
+          upterm host --accept --skip-host-key-check --private-key ~/.ssh/upterm_key --force-command "tmux new-session -d -s upterm && tmux attach-session -t upterm" -- tmux new-session
       - name: Uninstall Homebrew
         run: |
           curl -O https://raw.githubusercontent.com/Homebrew/install/HEAD/uninstall.sh
@@ -776,9 +800,27 @@ jobs:
       - name: Setup tmux environment
         if: github.event_name == 'workflow_dispatch' && (github.event.inputs.debug == 'true' || github.event.inputs.early-debug == 'true')
         run: echo "PATH=/usr/local/deps/tmux/bin:$PATH" >> $GITHUB_ENV
+      - name: Install upterm
+        if: github.event_name == 'workflow_dispatch' && github.event.inputs.debug == 'true'
+        run: |
+          # Download upterm static binary from GitHub releases
+          curl -LO https://github.com/owenthereal/upterm/releases/download/v0.20.0/upterm_darwin_arm64.tar.gz
+          tar -zxf upterm_darwin_arm64.tar.gz
+          sudo mv upterm /usr/local/bin/
+          sudo chmod +x /usr/local/bin/upterm
+      - name: Generate SSH key for upterm
+        if: github.event_name == 'workflow_dispatch' && github.event.inputs.debug == 'true'
+        run: |
+          mkdir -p ~/.ssh
+          if [ ! -f ~/.ssh/upterm_key ]; then
+            ssh-keygen -t ed25519 -f ~/.ssh/upterm_key -N "" -C "upterm-ci"
+          fi
       - name: Setup upterm session
         if: github.event_name == 'workflow_dispatch' && github.event.inputs.debug == 'true'
-        uses: owenthereal/action-upterm@v1
+        run: |
+          # Start upterm host session
+          echo "Starting upterm session..."
+          upterm host --accept --skip-host-key-check --private-key ~/.ssh/upterm_key --force-command "tmux new-session -d -s upterm && tmux attach-session -t upterm" -- tmux new-session
       - name: Build Emacs
         run: |
           git clone --depth 1 https://github.com/emacs-mirror/emacs.git
