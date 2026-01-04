@@ -301,12 +301,12 @@ jobs:
         uses: actions/cache@v4
         with:
           path: /usr/local/deps/libxml2
-          key: libxml2-2.9.9-${{ runner.os }}
+          key: libxml2-2.15.1-${{ runner.os }}
       - name: Install Libxml2
         if: steps.cache-libxml2.outputs.cache-hit != 'true'
         run: |
-          curl -O https://download.gnome.org/sources/libxml2/2.9/libxml2-2.9.9.tar.xz
-          tar -Jxf libxml2-2.9.9.tar.xz && cd libxml2-2.9.9
+          curl -LO https://download.gnome.org/sources/libxml2/2.15/libxml2-2.15.1.tar.xz
+          tar -Jxf libxml2-2.15.1.tar.xz && cd libxml2-2.15.1
           ./configure --prefix=/usr/local/deps/libxml2 --disable-shared && make -j4
           sudo make install
       - name: Save Libxml2 cache
@@ -314,7 +314,7 @@ jobs:
         uses: actions/cache/save@v4
         with:
           path: /usr/local/deps/libxml2
-          key: libxml2-2.9.9-${{ runner.os }}
+          key: libxml2-2.15.1-${{ runner.os }}
       - name: Setup Libxml2 environment
         run: |
           echo "PKG_CONFIG_PATH=/usr/local/deps/libxml2/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
@@ -421,12 +421,12 @@ jobs:
         uses: actions/cache@v4
         with:
           path: /usr/local/deps/treesitter
-          key: treesitter-0.25.10-${{ runner.os }}
+          key: treesitter-0.26.3-${{ runner.os }}
       - name: Install Libtreesitter
         if: steps.cache-treesitter.outputs.cache-hit != 'true'
         run: |
-          curl -LO https://github.com/tree-sitter/tree-sitter/archive/refs/tags/v0.25.10.tar.gz
-          tar -zxf v0.25.10.tar.gz && cd tree-sitter-0.25.10
+          curl -LO https://github.com/tree-sitter/tree-sitter/archive/refs/tags/v0.26.3.tar.gz
+          tar -zxf v0.26.3.tar.gz && cd tree-sitter-0.26.3
           make PREFIX=/usr/local/deps/treesitter -j4
           sudo make PREFIX=/usr/local/deps/treesitter install
           sudo find /usr/local/deps/treesitter/lib -name 'libtree-sitter*.dylib' -delete
@@ -435,7 +435,7 @@ jobs:
         uses: actions/cache/save@v4
         with:
           path: /usr/local/deps/treesitter
-          key: treesitter-0.25.10-${{ runner.os }}
+          key: treesitter-0.26.3-${{ runner.os }}
       - name: Setup Libtreesitter environment
         run: |
           echo "PKG_CONFIG_PATH=/usr/local/deps/treesitter/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
@@ -470,12 +470,12 @@ jobs:
         uses: actions/cache@v4
         with:
           path: /usr/local/deps/openssl
-          key: openssl-3.2.1-${{ runner.os }}
+          key: openssl-3.6.0-${{ runner.os }}
       - name: Install OpenSSL
         if: steps.cache-openssl.outputs.cache-hit != 'true'
         run: |
-          curl -LO https://www.openssl.org/source/openssl-3.2.1.tar.gz
-          tar -zxf openssl-3.2.1.tar.gz && cd openssl-3.2.1
+          curl -LO https://github.com/openssl/openssl/releases/download/openssl-3.6.0/openssl-3.6.0.tar.gz
+          tar -zxf openssl-3.6.0.tar.gz && cd openssl-3.6.0
           ./Configure darwin64-arm64-cc --prefix=/usr/local/deps/openssl --openssldir=/usr/local/deps/openssl no-shared
           make -j4
           sudo make install_sw
@@ -484,7 +484,7 @@ jobs:
         uses: actions/cache/save@v4
         with:
           path: /usr/local/deps/openssl
-          key: openssl-3.2.1-${{ runner.os }}
+          key: openssl-3.6.0-${{ runner.os }}
       - name: Setup OpenSSL environment
         run: |
           echo "PKG_CONFIG_PATH=/usr/local/deps/openssl/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
