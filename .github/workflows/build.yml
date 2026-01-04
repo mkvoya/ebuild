@@ -48,6 +48,9 @@ jobs:
       - name: Setup upterm session (early)
         if: github.event_name == 'workflow_dispatch' && github.event.inputs.early-debug == 'true'
         run: |
+          # Configure tmux for upterm
+          mkdir -p ~/.config/tmux
+          echo 'set-option -ga update-environment "UPTERM_ADMIN_SOCKET"' >> ~/.tmux.conf || echo 'set-option -ga update-environment "UPTERM_ADMIN_SOCKET"' > ~/.tmux.conf
           # Start upterm host session
           echo "Starting upterm session..."
           upterm host --accept --skip-host-key-check --private-key ~/.ssh/upterm_key --force-command "tmux new-session -d -s upterm && tmux attach-session -t upterm" -- tmux new-session
@@ -818,6 +821,9 @@ jobs:
       - name: Setup upterm session
         if: github.event_name == 'workflow_dispatch' && github.event.inputs.debug == 'true'
         run: |
+          # Configure tmux for upterm
+          mkdir -p ~/.config/tmux
+          echo 'set-option -ga update-environment "UPTERM_ADMIN_SOCKET"' >> ~/.tmux.conf || echo 'set-option -ga update-environment "UPTERM_ADMIN_SOCKET"' > ~/.tmux.conf
           # Start upterm host session
           echo "Starting upterm session..."
           upterm host --accept --skip-host-key-check --private-key ~/.ssh/upterm_key --force-command "tmux new-session -d -s upterm && tmux attach-session -t upterm" -- tmux new-session
