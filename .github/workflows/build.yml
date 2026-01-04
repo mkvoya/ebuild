@@ -660,6 +660,45 @@ jobs:
           echo "PKG_CONFIG_PATH=/usr/local/deps/libpng/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
           echo "CPPFLAGS=-I/usr/local/deps/libpng/include $CPPFLAGS" >> $GITHUB_ENV
           echo "LDFLAGS=-L/usr/local/deps/libpng/lib $LDFLAGS" >> $GITHUB_ENV
+      - name: Prepare meson
+        id: prepare-meson
+        run: sudo pip install meson
+      - name: Prepare ninja
+        id: prepare-ninja
+        run: |
+          curl -LO https://github.com/ninja-build/ninja/releases/download/v1.13.2/ninja-mac.zip
+          unzip ninja-mac.zip
+          sudo mkdir -p /usr/local/deps/ninja/bin
+          sudo mv ninja /usr/local/deps/ninja/bin/
+          sudo chmod +x /usr/local/deps/ninja/bin/ninja
+      - name: Setup Ninja environment
+        run: echo "PATH=/usr/local/deps/ninja/bin:$PATH" >> $GITHUB_ENV
+      - name: Cache Cairo
+        id: cache-cairo
+        uses: actions/cache@v4
+        with:
+          path: /usr/local/deps/cairo
+          key: cairo-1.18.4-${{ runner.os }}
+      - name: Install Cairo
+        if: steps.cache-cairo.outputs.cache-hit != 'true'
+        run: |
+          curl -LO https://cairographics.org/releases/cairo-1.18.4.tar.xz
+          tar -Jxf cairo-1.18.4.tar.xz && cd cairo-1.18.4
+          mkdir _build
+          meson setup _build 
+          ninja -C _build
+          ninja -C _build install --prefix=/usr/local/deps/cairo
+      - name: Save Cairo cache
+        if: steps.cache-cairo.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: /usr/local/deps/cairo
+          key: cairo-1.18.4-${{ runner.os }}
+      - name: Setup Cairo environment
+        run: |
+          echo "PKG_CONFIG_PATH=/usr/local/deps/cairo/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
+          echo "CPPFLAGS=-I/usr/local/deps/cairo/include $CPPFLAGS" >> $GITHUB_ENV
+          echo "LDFLAGS=-L/usr/local/deps/cairo/lib $LDFLAGS" >> $GITHUB_ENV
       - name: Cache librsvg
         id: cache-librsvg
         uses: actions/cache@v4
@@ -671,8 +710,17 @@ jobs:
         run: |
           curl -LO https://download.gnome.org/sources/librsvg/2.60/librsvg-2.60.1.tar.xz
           tar -Jxf librsvg-2.60.1.tar.xz && cd librsvg-2.60.1
-          ./configure --prefix=/usr/local/deps/librsvg --disable-shared && make -j4
-          sudo make install
+          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+          source "$HOME/.cargo/env"
+          rustc --version
+          cargo --version
+          # Install cargo-c which is required for librsvg (provides cargo-cbuild)
+          cargo install cargo-c
+          mkdir -p _build
+          meson setup _build --prefix=/usr/local/deps/librsvg -Ddocs=disabled -Dintrospection=disabled -Dvala=disabled
+          meson compile -C _build
+          meson install -C _build --prefix=/usr/local/deps/librsvg
       - name: Save librsvg cache
         if: steps.cache-librsvg.outputs.cache-hit != 'true'
         uses: actions/cache/save@v4
