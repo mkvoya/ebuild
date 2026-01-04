@@ -717,7 +717,7 @@ jobs:
         run: |
           curl -LO https://github.com/ImageMagick/ImageMagick/archive/refs/tags/7.1.2-12.tar.gz
           tar -zxf 7.1.2-12.tar.gz && cd ImageMagick-7.1.2-12
-          ./configure --prefix=/usr/local/deps/imagemagick --disable-shared --without-x --without-perl --without-xml && make -j4
+          ./configure --prefix=/usr/local/deps/imagemagick --disable-shared --without-x --without-perl --enable-deprecated --with-magick-plus-plus=no && make -j4
           sudo make install
       - name: Save ImageMagick cache
         if: steps.cache-imagemagick.outputs.cache-hit != 'true'
