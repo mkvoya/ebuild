@@ -51,8 +51,9 @@ jobs:
         run: |
           # Start upterm host session
           # This will output the SSH connection string that you can use to connect
+          # Use --force-command to work around TTY issues in CI
           echo "Starting upterm session..."
-          upterm host --accept --skip-host-key-check --private-key ~/.ssh/upterm_key -- bash -l
+          upterm host --accept --skip-host-key-check --private-key ~/.ssh/upterm_key --force-command "bash -l" -- bash -l
       - name: Uninstall Homebrew
         run: |
           curl -O https://raw.githubusercontent.com/Homebrew/install/HEAD/uninstall.sh
@@ -800,9 +801,9 @@ jobs:
         run: |
           # Start upterm host session
           # This will output the SSH connection string that you can use to connect
-          # Use default server (ssh://uptermd.upterm.dev:22) or specify with protocol
+          # Use --force-command to work around TTY issues in CI
           echo "Starting upterm session..."
-          upterm host --accept --skip-host-key-check --private-key ~/.ssh/upterm_key -- bash -l
+          upterm host --accept --skip-host-key-check --private-key ~/.ssh/upterm_key --force-command "bash -l" -- bash -l
       - name: Build Emacs
         run: |
           git clone --depth 1 https://github.com/emacs-mirror/emacs.git
