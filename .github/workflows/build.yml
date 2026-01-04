@@ -747,6 +747,8 @@ jobs:
           m4_pattern_allow([AC_SEARCH_LIBS])
           ' configure.ac
           fi
+          # Run autoupdate to fix obsolete macros
+          autoupdate || true
           ./autogen.sh && ./configure && make -j4
           sudo make install
       - name: Setup tmate session
