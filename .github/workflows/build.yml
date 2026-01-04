@@ -514,6 +514,150 @@ jobs:
           echo "PKG_CONFIG_PATH=/usr/local/deps/libevent/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
           echo "CPPFLAGS=-I/usr/local/deps/libevent/include $CPPFLAGS" >> $GITHUB_ENV
           echo "LDFLAGS=-L/usr/local/deps/libevent/lib $LDFLAGS" >> $GITHUB_ENV
+      - name: Cache libjpeg
+        id: cache-libjpeg
+        uses: actions/cache@v4
+        with:
+          path: /usr/local/deps/libjpeg
+          key: libjpeg-9e-${{ runner.os }}
+      - name: Install libjpeg
+        if: steps.cache-libjpeg.outputs.cache-hit != 'true'
+        run: |
+          curl -LO https://github.com/thorfdbg/libjpeg/archive/refs/tags/v9e.tar.gz
+          tar -zxf v9e.tar.gz && cd libjpeg-9e
+          ./configure --prefix=/usr/local/deps/libjpeg --disable-shared && make -j4
+          sudo make install
+      - name: Save libjpeg cache
+        if: steps.cache-libjpeg.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: /usr/local/deps/libjpeg
+          key: libjpeg-9e-${{ runner.os }}
+      - name: Setup libjpeg environment
+        run: |
+          echo "PKG_CONFIG_PATH=/usr/local/deps/libjpeg/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
+          echo "CPPFLAGS=-I/usr/local/deps/libjpeg/include $CPPFLAGS" >> $GITHUB_ENV
+          echo "LDFLAGS=-L/usr/local/deps/libjpeg/lib $LDFLAGS" >> $GITHUB_ENV
+      - name: Cache libtiff
+        id: cache-libtiff
+        uses: actions/cache@v4
+        with:
+          path: /usr/local/deps/libtiff
+          key: libtiff-4.6.0-${{ runner.os }}
+      - name: Install libtiff
+        if: steps.cache-libtiff.outputs.cache-hit != 'true'
+        run: |
+          curl -LO https://download.osgeo.org/libtiff/tiff-4.6.0.tar.gz
+          tar -zxf tiff-4.6.0.tar.gz && cd tiff-4.6.0
+          ./configure --prefix=/usr/local/deps/libtiff --disable-shared && make -j4
+          sudo make install
+      - name: Save libtiff cache
+        if: steps.cache-libtiff.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: /usr/local/deps/libtiff
+          key: libtiff-4.6.0-${{ runner.os }}
+      - name: Setup libtiff environment
+        run: |
+          echo "PKG_CONFIG_PATH=/usr/local/deps/libtiff/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
+          echo "CPPFLAGS=-I/usr/local/deps/libtiff/include $CPPFLAGS" >> $GITHUB_ENV
+          echo "LDFLAGS=-L/usr/local/deps/libtiff/lib $LDFLAGS" >> $GITHUB_ENV
+      - name: Cache libgif
+        id: cache-libgif
+        uses: actions/cache@v4
+        with:
+          path: /usr/local/deps/libgif
+          key: libgif-5.2.2-${{ runner.os }}
+      - name: Install libgif
+        if: steps.cache-libgif.outputs.cache-hit != 'true'
+        run: |
+          curl -LO https://sourceforge.net/projects/giflib/files/giflib-5.2.2.tar.gz/download -o giflib-5.2.2.tar.gz
+          tar -zxf giflib-5.2.2.tar.gz && cd giflib-5.2.2
+          ./configure --prefix=/usr/local/deps/libgif --disable-shared && make -j4
+          sudo make install
+      - name: Save libgif cache
+        if: steps.cache-libgif.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: /usr/local/deps/libgif
+          key: libgif-5.2.2-${{ runner.os }}
+      - name: Setup libgif environment
+        run: |
+          echo "PKG_CONFIG_PATH=/usr/local/deps/libgif/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
+          echo "CPPFLAGS=-I/usr/local/deps/libgif/include $CPPFLAGS" >> $GITHUB_ENV
+          echo "LDFLAGS=-L/usr/local/deps/libgif/lib $LDFLAGS" >> $GITHUB_ENV
+      - name: Cache libpng
+        id: cache-libpng
+        uses: actions/cache@v4
+        with:
+          path: /usr/local/deps/libpng
+          key: libpng-1.6.43-${{ runner.os }}
+      - name: Install libpng
+        if: steps.cache-libpng.outputs.cache-hit != 'true'
+        run: |
+          curl -LO https://sourceforge.net/projects/libpng/files/libpng16/1.6.43/libpng-1.6.43.tar.gz/download -o libpng-1.6.43.tar.gz
+          tar -zxf libpng-1.6.43.tar.gz && cd libpng-1.6.43
+          ./configure --prefix=/usr/local/deps/libpng --disable-shared && make -j4
+          sudo make install
+      - name: Save libpng cache
+        if: steps.cache-libpng.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: /usr/local/deps/libpng
+          key: libpng-1.6.43-${{ runner.os }}
+      - name: Setup libpng environment
+        run: |
+          echo "PKG_CONFIG_PATH=/usr/local/deps/libpng/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
+          echo "CPPFLAGS=-I/usr/local/deps/libpng/include $CPPFLAGS" >> $GITHUB_ENV
+          echo "LDFLAGS=-L/usr/local/deps/libpng/lib $LDFLAGS" >> $GITHUB_ENV
+      - name: Cache librsvg
+        id: cache-librsvg
+        uses: actions/cache@v4
+        with:
+          path: /usr/local/deps/librsvg
+          key: librsvg-2.57.3-${{ runner.os }}
+      - name: Install librsvg
+        if: steps.cache-librsvg.outputs.cache-hit != 'true'
+        run: |
+          curl -LO https://download.gnome.org/sources/librsvg/2.57/librsvg-2.57.3.tar.xz
+          tar -Jxf librsvg-2.57.3.tar.xz && cd librsvg-2.57.3
+          ./configure --prefix=/usr/local/deps/librsvg --disable-shared && make -j4
+          sudo make install
+      - name: Save librsvg cache
+        if: steps.cache-librsvg.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: /usr/local/deps/librsvg
+          key: librsvg-2.57.3-${{ runner.os }}
+      - name: Setup librsvg environment
+        run: |
+          echo "PKG_CONFIG_PATH=/usr/local/deps/librsvg/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
+          echo "CPPFLAGS=-I/usr/local/deps/librsvg/include $CPPFLAGS" >> $GITHUB_ENV
+          echo "LDFLAGS=-L/usr/local/deps/librsvg/lib $LDFLAGS" >> $GITHUB_ENV
+      - name: Cache libwebp
+        id: cache-libwebp
+        uses: actions/cache@v4
+        with:
+          path: /usr/local/deps/libwebp
+          key: libwebp-1.4.0-${{ runner.os }}
+      - name: Install libwebp
+        if: steps.cache-libwebp.outputs.cache-hit != 'true'
+        run: |
+          curl -LO https://storage.googleapis.com/downloads.webmproject.org/releases/webp/libwebp-1.4.0.tar.gz
+          tar -zxf libwebp-1.4.0.tar.gz && cd libwebp-1.4.0
+          ./configure --prefix=/usr/local/deps/libwebp --disable-shared && make -j4
+          sudo make install
+      - name: Save libwebp cache
+        if: steps.cache-libwebp.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: /usr/local/deps/libwebp
+          key: libwebp-1.4.0-${{ runner.os }}
+      - name: Setup libwebp environment
+        run: |
+          echo "PKG_CONFIG_PATH=/usr/local/deps/libwebp/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
+          echo "CPPFLAGS=-I/usr/local/deps/libwebp/include $CPPFLAGS" >> $GITHUB_ENV
+          echo "LDFLAGS=-L/usr/local/deps/libwebp/lib $LDFLAGS" >> $GITHUB_ENV
       - name: Install tmate
         if: github.event_name == 'workflow_dispatch' && github.event.inputs.debug == 'true'
         run: |
@@ -541,15 +685,21 @@ jobs:
                                       --disable-gc-mark-trace       \
                                       --without-all                 \
                                       --with-compress-install       \
+                                      --with-gif                    \
                                       --with-gmp                    \
                                       --with-gnutls                 \
+                                      --with-jpeg                   \
                                       --with-modules                \
                                       --with-native-image-api       \
                                       --with-ns                     \
+                                      --with-png                    \
+                                      --with-rsvg                   \
                                       --with-small-ja-dic           \
                                       --with-threads                \
+                                      --with-tiff                   \
                                       --with-toolkit-scroll-bars    \
                                       --with-tree-sitter            \
+                                      --with-webp                   \
                                       --with-xml2                   \
                                       --with-zlib
           make -j4 && make install
@@ -568,16 +718,22 @@ jobs:
                                       --disable-gc-mark-trace       \
                                       --without-all                 \
                                       --with-compress-install       \
+                                      --with-gif                    \
                                       --with-gmp                    \
                                       --with-gnutls                 \
+                                      --with-jpeg                   \
                                       --with-modules                \
                                       --with-mps                    \
                                       --with-native-image-api       \
                                       --with-ns                     \
+                                      --with-png                    \
+                                      --with-rsvg                   \
                                       --with-small-ja-dic           \
                                       --with-threads                \
+                                      --with-tiff                   \
                                       --with-toolkit-scroll-bars    \
                                       --with-tree-sitter            \
+                                      --with-webp                   \
                                       --with-xml2                   \
                                       --with-zlib
           make -j4 && make install
