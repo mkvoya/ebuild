@@ -24,7 +24,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 1
-      - name: Setup upterm session (early)
+      - name: Install upterm (early)
         if: github.event_name == 'workflow_dispatch' && github.event.inputs.early-debug == 'true'
         run: |
           # Download and install upterm
@@ -38,11 +38,13 @@ jobs:
           tar -zxf upterm_darwin_${UPTERM_ARCH}.tar.gz
           sudo mv upterm /usr/local/bin/
           sudo chmod +x /usr/local/bin/upterm
-          # Start upterm server in background
-          upterm host --server-command "bash -l" &
-          sleep 2
-          # Get the connection string
-          upterm session current 2>/dev/null || echo "Upterm session started. Use 'upterm session current' to get connection details."
+      - name: Setup upterm session (early)
+        if: github.event_name == 'workflow_dispatch' && github.event.inputs.early-debug == 'true'
+        run: |
+          # Start upterm host session
+          # This will output the SSH connection string that you can use to connect
+          echo "Starting upterm session..."
+          upterm host --server uptermd.upterm.dev -- bash -l
       - name: Uninstall Homebrew
         run: |
           curl -O https://raw.githubusercontent.com/Homebrew/install/HEAD/uninstall.sh
@@ -787,11 +789,10 @@ jobs:
       - name: Setup upterm session
         if: github.event_name == 'workflow_dispatch' && github.event.inputs.debug == 'true'
         run: |
-          # Start upterm server in background
-          upterm host --server-command "bash -l" &
-          sleep 2
-          # Get the connection string
-          upterm session current 2>/dev/null || echo "Upterm session started. Use 'upterm session current' to get connection details."
+          # Start upterm host session
+          # This will output the SSH connection string that you can use to connect
+          echo "Starting upterm session..."
+          upterm host --server uptermd.upterm.dev -- bash -l
       - name: Build Emacs
         run: |
           git clone --depth 1 https://github.com/emacs-mirror/emacs.git
