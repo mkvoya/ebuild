@@ -143,6 +143,11 @@ jobs:
           tar -zxf pkgconf-2.5.1.tar.gz && cd pkgconf-pkgconf-2.5.1
           ./autogen.sh && ./configure --prefix=/usr/local/deps/pkgconf --disable-shared && make -j4
           sudo make install
+          # pkgconf doesn't install pkg.m4 by default, check if it exists in source and install it
+          if [ -f pkg.m4 ]; then
+            sudo mkdir -p /usr/local/deps/pkgconf/share/aclocal
+            sudo cp pkg.m4 /usr/local/deps/pkgconf/share/aclocal/
+          fi
       - name: Save Pkgconf cache
         if: steps.cache-pkgconf.outputs.cache-hit != 'true'
         uses: actions/cache/save@v4
@@ -157,6 +162,18 @@ jobs:
           fi
           echo "PATH=/usr/local/deps/pkgconf/bin:$PATH" >> $GITHUB_ENV
           echo "PKG_CONFIG_PATH=/usr/local/deps/pkgconf/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
+          # Add pkgconf's aclocal path if pkg.m4 was installed there
+          if [ -d /usr/local/deps/pkgconf/share/aclocal ]; then
+            echo "ACLOCAL_PATH=/usr/local/deps/pkgconf/share/aclocal:$ACLOCAL_PATH" >> $GITHUB_ENV
+          fi
+          # Add system aclocal paths for pkg.m4 (PKG_PROG_PKG_CONFIG macros)
+          # These are usually in /usr/share/aclocal or /opt/homebrew/share/aclocal
+          if [ -d /usr/share/aclocal ]; then
+            echo "ACLOCAL_PATH=/usr/share/aclocal:$ACLOCAL_PATH" >> $GITHUB_ENV
+          fi
+          if [ -d /opt/homebrew/share/aclocal ]; then
+            echo "ACLOCAL_PATH=/opt/homebrew/share/aclocal:$ACLOCAL_PATH" >> $GITHUB_ENV
+          fi
       - name: Cache GNU Texinfo
         id: cache-texinfo
         uses: actions/cache@v4
