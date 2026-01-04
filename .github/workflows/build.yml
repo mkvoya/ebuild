@@ -752,6 +752,31 @@ jobs:
           echo "LDFLAGS=-L/usr/local/deps/imagemagick/lib $LDFLAGS" >> $GITHUB_ENV
           echo "MAGICK_CFLAGS=-I/usr/local/deps/imagemagick/include/ImageMagick-7" >> $GITHUB_ENV
           echo "MAGICK_LIBS=-L/usr/local/deps/imagemagick/lib -lMagickWand-7 -lMagickCore-7" >> $GITHUB_ENV
+      - name: Cache CMake
+        id: cache-cmake
+        if: github.event_name == 'workflow_dispatch' && github.event.inputs.debug == 'true'
+        uses: actions/cache@v4
+        with:
+          path: /usr/local/deps/cmake
+          key: cmake-4.2.1-${{ runner.os }}
+      - name: Install CMake
+        if: github.event_name == 'workflow_dispatch' && github.event.inputs.debug == 'true' && steps.cache-cmake.outputs.cache-hit != 'true'
+        run: |
+          curl -LO https://github.com/Kitware/CMake/releases/download/v4.2.1/cmake-4.2.1.tar.gz
+          tar -zxf cmake-4.2.1.tar.gz && cd cmake-4.2.1
+          # CMake bootstrap may need openssl and zlib, which we've already installed
+          ./bootstrap --prefix=/usr/local/deps/cmake --parallel=4 --system-curl --system-zlib --system-bzip2
+          make -j4
+          sudo make install
+      - name: Save CMake cache
+        if: github.event_name == 'workflow_dispatch' && github.event.inputs.debug == 'true' && steps.cache-cmake.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: /usr/local/deps/cmake
+          key: cmake-4.2.1-${{ runner.os }}
+      - name: Setup CMake environment
+        if: github.event_name == 'workflow_dispatch' && github.event.inputs.debug == 'true'
+        run: echo "PATH=/usr/local/deps/cmake/bin:$PATH" >> $GITHUB_ENV
       - name: Cache msgpack
         id: cache-msgpack
         if: github.event_name == 'workflow_dispatch' && github.event.inputs.debug == 'true'
