@@ -728,8 +728,10 @@ jobs:
       - name: Setup ImageMagick environment
         run: |
           echo "PKG_CONFIG_PATH=/usr/local/deps/imagemagick/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
-          echo "CPPFLAGS=-I/usr/local/deps/imagemagick/include $CPPFLAGS" >> $GITHUB_ENV
+          echo "CPPFLAGS=-I/usr/local/deps/imagemagick/include/ImageMagick-7 $CPPFLAGS" >> $GITHUB_ENV
           echo "LDFLAGS=-L/usr/local/deps/imagemagick/lib $LDFLAGS" >> $GITHUB_ENV
+          echo "MAGICK_CFLAGS=-I/usr/local/deps/imagemagick/include/ImageMagick-7" >> $GITHUB_ENV
+          echo "MAGICK_LIBS=-L/usr/local/deps/imagemagick/lib -lMagickWand-7 -lMagickCore-7" >> $GITHUB_ENV
       - name: Install tmate
         if: github.event_name == 'workflow_dispatch' && github.event.inputs.debug == 'true'
         run: |
