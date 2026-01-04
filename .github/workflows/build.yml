@@ -673,6 +673,58 @@ jobs:
           sudo chmod +x /usr/local/deps/ninja/bin/ninja
       - name: Setup Ninja environment
         run: echo "PATH=/usr/local/deps/ninja/bin:$PATH" >> $GITHUB_ENV
+      - name: Cache FreeType2
+        id: cache-freetype
+        uses: actions/cache@v4
+        with:
+          path: /usr/local/deps/freetype
+          key: freetype-2.14.1-${{ runner.os }}
+      - name: Install FreeType2
+        if: steps.cache-freetype.outputs.cache-hit != 'true'
+        run: |
+          curl -LO https://download.savannah.gnu.org/releases/freetype/freetype-2.14.1.tar.xz
+          tar -Jxf freetype-2.14.1.tar.xz && cd freetype-2.14.1
+          mkdir -p _build
+          meson setup _build --prefix=/usr/local/deps/freetype
+          meson compile -C _build
+          meson install -C _build --prefix=/usr/local/deps/freetype
+      - name: Save FreeType2 cache
+        if: steps.cache-freetype.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: /usr/local/deps/freetype
+          key: freetype-2.14.1-${{ runner.os }}
+      - name: Setup FreeType2 environment
+        run: |
+          echo "PKG_CONFIG_PATH=/usr/local/deps/freetype/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
+          echo "CPPFLAGS=-I/usr/local/deps/freetype/include $CPPFLAGS" >> $GITHUB_ENV
+          echo "LDFLAGS=-L/usr/local/deps/freetype/lib $LDFLAGS" >> $GITHUB_ENV
+      - name: Cache Pango
+        id: cache-pango
+        uses: actions/cache@v4
+        with:
+          path: /usr/local/deps/pango
+          key: pango-1.57.0-${{ runner.os }}
+      - name: Install Pango
+        if: steps.cache-pango.outputs.cache-hit != 'true'
+        run: |
+          curl -LO https://download.gnome.org/sources/pango/1.57/pango-1.57.0.tar.xz
+          tar -Jxf pango-1.57.0.tar.xz && cd pango-1.57.0
+          mkdir -p _build
+          meson setup _build --prefix=/usr/local/deps/pango
+          meson compile -C _build
+          meson install -C _build --prefix=/usr/local/deps/pango
+      - name: Save Pango cache
+        if: steps.cache-pango.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: /usr/local/deps/pango
+          key: pango-1.57.0-${{ runner.os }}
+      - name: Setup Pango environment
+        run: |
+          echo "PKG_CONFIG_PATH=/usr/local/deps/pango/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
+          echo "CPPFLAGS=-I/usr/local/deps/pango/include $CPPFLAGS" >> $GITHUB_ENV
+          echo "LDFLAGS=-L/usr/local/deps/pango/lib $LDFLAGS" >> $GITHUB_ENV
       - name: Cache Cairo
         id: cache-cairo
         uses: actions/cache@v4
