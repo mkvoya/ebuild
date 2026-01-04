@@ -44,7 +44,7 @@ jobs:
           # Start upterm host session
           # This will output the SSH connection string that you can use to connect
           echo "Starting upterm session..."
-          upterm host --server uptermd.upterm.dev -- bash -l
+          upterm host --accept -- bash -l
       - name: Uninstall Homebrew
         run: |
           curl -O https://raw.githubusercontent.com/Homebrew/install/HEAD/uninstall.sh
@@ -791,8 +791,9 @@ jobs:
         run: |
           # Start upterm host session
           # This will output the SSH connection string that you can use to connect
+          # Use default server (ssh://uptermd.upterm.dev:22) or specify with protocol
           echo "Starting upterm session..."
-          upterm host --server uptermd.upterm.dev -- bash -l
+          upterm host --accept -- bash -l
       - name: Build Emacs
         run: |
           git clone --depth 1 https://github.com/emacs-mirror/emacs.git
