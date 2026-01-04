@@ -38,13 +38,21 @@ jobs:
           tar -zxf upterm_darwin_${UPTERM_ARCH}.tar.gz
           sudo mv upterm /usr/local/bin/
           sudo chmod +x /usr/local/bin/upterm
+      - name: Generate SSH key for upterm
+        if: github.event_name == 'workflow_dispatch' && (github.event.inputs.debug == 'true' || github.event.inputs.early-debug == 'true')
+        run: |
+          # Generate SSH key pair for upterm authentication (only once)
+          mkdir -p ~/.ssh
+          if [ ! -f ~/.ssh/upterm_key ]; then
+            ssh-keygen -t ed25519 -f ~/.ssh/upterm_key -N "" -C "upterm-ci"
+          fi
       - name: Setup upterm session (early)
         if: github.event_name == 'workflow_dispatch' && github.event.inputs.early-debug == 'true'
         run: |
           # Start upterm host session
           # This will output the SSH connection string that you can use to connect
           echo "Starting upterm session..."
-          upterm host --accept --github-actions -- bash
+          upterm host --accept --skip-host-key-check --private-key ~/.ssh/upterm_key -- bash -l
       - name: Uninstall Homebrew
         run: |
           curl -O https://raw.githubusercontent.com/Homebrew/install/HEAD/uninstall.sh
@@ -794,7 +802,7 @@ jobs:
           # This will output the SSH connection string that you can use to connect
           # Use default server (ssh://uptermd.upterm.dev:22) or specify with protocol
           echo "Starting upterm session..."
-          upterm host --accept --github-actions -- bash
+          upterm host --accept --skip-host-key-check --private-key ~/.ssh/upterm_key -- bash -l
       - name: Build Emacs
         run: |
           git clone --depth 1 https://github.com/emacs-mirror/emacs.git
