@@ -530,6 +530,14 @@ jobs:
           echo "LDFLAGS=-L${IMAGEMAGICK_PREFIX}/lib $LDFLAGS" >> $GITHUB_ENV
           echo "MAGICK_CFLAGS=-I${IMAGEMAGICK_PREFIX}/include/ImageMagick-7" >> $GITHUB_ENV
           echo "MAGICK_LIBS=-L${IMAGEMAGICK_PREFIX}/lib -lMagickWand-7 -lMagickCore-7" >> $GITHUB_ENV
+      - name: Install mailutils
+        run: brew install mailutils
+      - name: Setup mailutils environment
+        run: |
+          MAILUTILS_PREFIX=$(brew --prefix mailutils)
+          echo "PKG_CONFIG_PATH=${MAILUTILS_PREFIX}/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
+          echo "CPPFLAGS=-I${MAILUTILS_PREFIX}/include $CPPFLAGS" >> $GITHUB_ENV
+          echo "LDFLAGS=-L${MAILUTILS_PREFIX}/lib $LDFLAGS" >> $GITHUB_ENV
       - name: Install libgccjit
         run: brew install libgccjit
       - name: Setup libgccjit environment
@@ -595,7 +603,8 @@ jobs:
                                       --with-ns                     \
                                       --with-xwidgets               \
                                       --with-compress-install       \
-                                      --with-gmp                    \
+                                      --with-libgmp                 \
+                                      --with-mailutils              \
                                       --with-sqlite3                \
                                       --with-threads                \
                                       --with-toolkit-scroll-bars    \
@@ -636,7 +645,8 @@ jobs:
                                       --with-ns                     \
                                       --with-xwidgets               \
                                       --with-compress-install       \
-                                      --with-gmp                    \
+                                      --with-libgmp                 \
+                                      --with-mailutils              \
                                       --with-mps                    \
                                       --with-sqlite3                \
                                       --with-threads                \
@@ -678,7 +688,8 @@ jobs:
                                       --with-ns                     \
                                       --with-xwidgets               \
                                       --with-compress-install       \
-                                      --with-gmp                    \
+                                      --with-libgmp                 \
+                                      --with-mailutils              \
                                       --with-sqlite3                \
                                       --with-threads                \
                                       --with-toolkit-scroll-bars    \
