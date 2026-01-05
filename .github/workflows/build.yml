@@ -762,17 +762,6 @@ jobs:
         run: |
           curl -LO https://download.gnome.org/sources/librsvg/2.60/librsvg-2.60.1.tar.xz
           tar -Jxf librsvg-2.60.1.tar.xz && cd librsvg-2.60.1
-          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
-          source "$HOME/.cargo/env"
-          rustc --version
-          cargo --version
-          # Install cargo-c which is required for librsvg (provides cargo-cbuild)
-          cargo install cargo-c
-          mkdir -p _build
-          meson setup _build --prefix=/usr/local/deps/librsvg -Ddefault_library=static -Ddocs=disabled -Dintrospection=disabled -Dvala=disabled
-          meson compile -C _build
-          meson install -C _build
       - name: Save librsvg cache
         if: steps.cache-librsvg.outputs.cache-hit != 'true'
         uses: actions/cache/save@v4
@@ -856,32 +845,6 @@ jobs:
           echo "PKG_CONFIG_PATH=/usr/local/deps/lcms2/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
           echo "CPPFLAGS=-I/usr/local/deps/lcms2/include $CPPFLAGS" >> $GITHUB_ENV
           echo "LDFLAGS=-L/usr/local/deps/lcms2/lib $LDFLAGS" >> $GITHUB_ENV
-      - name: Cache ImageMagick
-        id: cache-imagemagick
-        uses: actions/cache@v4
-        with:
-          path: /usr/local/deps/imagemagick
-          key: imagemagick-7.1.2-12-${{ runner.os }}
-      - name: Install ImageMagick
-        if: steps.cache-imagemagick.outputs.cache-hit != 'true'
-        run: |
-          curl -LO https://github.com/ImageMagick/ImageMagick/archive/refs/tags/7.1.2-12.tar.gz
-          tar -zxf 7.1.2-12.tar.gz && cd ImageMagick-7.1.2-12
-          ./configure --prefix=/usr/local/deps/imagemagick --disable-shared --without-x --without-perl --enable-deprecated --with-magick-plus-plus=no && make -j4
-          sudo make install
-      - name: Save ImageMagick cache
-        if: steps.cache-imagemagick.outputs.cache-hit != 'true'
-        uses: actions/cache/save@v4
-        with:
-          path: /usr/local/deps/imagemagick
-          key: imagemagick-7.1.2-12-${{ runner.os }}
-      - name: Setup ImageMagick environment
-        run: |
-          echo "PKG_CONFIG_PATH=/usr/local/deps/imagemagick/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
-          echo "CPPFLAGS=-I/usr/local/deps/imagemagick/include/ImageMagick-7 $CPPFLAGS" >> $GITHUB_ENV
-          echo "LDFLAGS=-L/usr/local/deps/imagemagick/lib $LDFLAGS" >> $GITHUB_ENV
-          echo "MAGICK_CFLAGS=-I/usr/local/deps/imagemagick/include/ImageMagick-7" >> $GITHUB_ENV
-          echo "MAGICK_LIBS=-L/usr/local/deps/imagemagick/lib -lMagickWand-7 -lMagickCore-7" >> $GITHUB_ENV
       - name: Cache tmux
         id: cache-tmux
         if: github.event_name == 'workflow_dispatch' && (github.event.inputs.debug == 'true' || github.event.inputs.early-debug == 'true')
