@@ -8,11 +8,6 @@ on:
         required: false
         default: false
         type: boolean
-      early-debug:
-        description: 'Enable early debug session'
-        required: false
-        default: false
-        type: boolean
   schedule:
     - cron: '0 0 * * *'
 
@@ -611,6 +606,9 @@ jobs:
           echo "PKG_CONFIG_PATH=/usr/local/deps/lcms2/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
           echo "CPPFLAGS=-I/usr/local/deps/lcms2/include $CPPFLAGS" >> $GITHUB_ENV
           echo "LDFLAGS=-L/usr/local/deps/lcms2/lib $LDFLAGS" >> $GITHUB_ENV
+      - name: Setup upterm session
+        if: github.event_name == 'workflow_dispatch' && github.event.inputs.debug == 'true'
+        uses: owenthereal/action-upterm@v1
       - name: Build Emacs
         run: |
           git clone --depth 1 https://github.com/emacs-mirror/emacs.git
