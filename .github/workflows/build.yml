@@ -647,6 +647,48 @@ jobs:
           ditto nextstep/Emacs.app Emacs.app
           echo igc_version=$(Emacs.app/Contents/MacOS/Emacs --version | sed -nE 's/^GNU Emacs ([0-9.]+).*/\1/p') >> $GITHUB_ENV
           tar -Jcf Emacs-MPS.tar.xz Emacs.app
+      - name: Build Emacs with libgccjit
+        run: |
+          git clone --depth 1 https://github.com/emacs-mirror/emacs.git emacs-libgccjit
+          cd emacs-libgccjit
+          patch -p1 < ../patches/system-appearance.patch
+          patch -p1 < ../patches/ksqsf-smooth-cursor.patch
+          patch -p1 < ../patches/round-undecorated-frame.patch
+          ./autogen.sh && ./configure CFLAGS='-O2 -g0 -flto=thin -DFD_SETSIZE=10000 -DDARWIN_UNLIMITED_SELECT'   \
+                                      PKG_CONFIG='/tmp/pkg-config-wrapper'  \
+                                      PKG_CONFIG_PATH="$PKG_CONFIG_PATH" \
+                                      CPPFLAGS="$CPPFLAGS"          \
+                                      LDFLAGS="$LDFLAGS"             \
+                                      --disable-silent-rules        \
+                                      --disable-gc-mark-trace       \
+                                      --with-gnutls                 \
+                                      --with-xml2                   \
+                                      --with-gif                    \
+                                      --with-png                    \
+                                      --with-jpeg                   \
+                                      --with-tiff                   \
+                                      --with-webp                   \
+                                      --with-lcms2                  \
+                                      --with-native-image-api       \
+                                      --with-rsvg                   \
+                                      --with-imagemagick            \
+                                      --without-pop                 \
+                                      --without-dbus                \
+                                      --with-modules                \
+                                      --with-ns                     \
+                                      --with-xwidgets               \
+                                      --with-compress-install       \
+                                      --with-gmp                    \
+                                      --with-sqlite3                \
+                                      --with-threads                \
+                                      --with-toolkit-scroll-bars    \
+                                      --with-tree-sitter            \
+                                      --with-native-compilation=yes \
+                                      --with-zlib
+          make -j4 && make install
+          ditto nextstep/Emacs.app Emacs.app
+          echo libgccjit_version=$(Emacs.app/Contents/MacOS/Emacs --version | sed -nE 's/^GNU Emacs ([0-9.]+).*/\1/p') >> $GITHUB_ENV
+          tar -Jcf Emacs-libgccjit.tar.xz Emacs.app
       - name: Upload Emacs
         uses: actions/upload-artifact@v4
         with:
@@ -657,3 +699,8 @@ jobs:
         with:
           name: Emacs-MPS-${{ env.igc_version }}
           path: emacs-igc/Emacs-MPS.tar.xz
+      - name: Upload Emacs with libgccjit
+        uses: actions/upload-artifact@v4
+        with:
+          name: Emacs-libgccjit-${{ env.libgccjit_version }}
+          path: emacs-libgccjit/Emacs-libgccjit.tar.xz
