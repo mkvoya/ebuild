@@ -443,9 +443,10 @@ jobs:
         run: brew install librsvg
       - name: Setup librsvg environment
         run: |
-          echo "PKG_CONFIG_PATH=/usr/local/deps/librsvg/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
-          echo "CPPFLAGS=-I/usr/local/deps/librsvg/include $CPPFLAGS" >> $GITHUB_ENV
-          echo "LDFLAGS=-L/usr/local/deps/librsvg/lib $LDFLAGS" >> $GITHUB_ENV
+          LIBRSVG_PREFIX=$(brew --prefix librsvg)
+          echo "PKG_CONFIG_PATH=${LIBRSVG_PREFIX}/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
+          echo "CPPFLAGS=-I${LIBRSVG_PREFIX}/include $CPPFLAGS" >> $GITHUB_ENV
+          echo "LDFLAGS=-L${LIBRSVG_PREFIX}/lib $LDFLAGS" >> $GITHUB_ENV
       - name: Cache libwebp
         id: cache-libwebp
         uses: actions/cache@v4
@@ -532,6 +533,29 @@ jobs:
       - name: Setup upterm session
         if: github.event_name == 'workflow_dispatch' && github.event.inputs.debug == 'true'
         uses: owenthereal/action-upterm@v1
+      - name: Create pkg-config wrapper for selective static linking
+        run: |
+          cat > /tmp/pkg-config-wrapper << 'EOF'
+          #!/bin/bash
+          # Wrapper to use static linking for all libraries except librsvg and imagemagick
+          # Check if this is librsvg or imagemagick by examining all arguments
+          USE_DYNAMIC=false
+          for arg in "$@"; do
+            if [[ "$arg" =~ (librsvg|rsvg|Magick|ImageMagick) ]]; then
+              USE_DYNAMIC=true
+              break
+            fi
+          done
+          
+          if [ "$USE_DYNAMIC" = true ]; then
+            # Use dynamic linking for librsvg and imagemagick
+            exec pkgconf "$@"
+          else
+            # Use static linking for other libraries
+            exec pkgconf -static "$@"
+          fi
+          EOF
+          chmod +x /tmp/pkg-config-wrapper
       - name: Build Emacs
         run: |
           git clone --depth 1 https://github.com/emacs-mirror/emacs.git
@@ -540,7 +564,7 @@ jobs:
           patch -p1 < ../patches/ksqsf-smooth-cursor.patch
           patch -p1 < ../patches/round-undecorated-frame.patch
           ./autogen.sh && ./configure CFLAGS='-O2 -g0 -flto=thin'   \
-                                      PKG_CONFIG='pkgconf -static'  \
+                                      PKG_CONFIG='/tmp/pkg-config-wrapper'  \
                                       PKG_CONFIG_PATH="$PKG_CONFIG_PATH" \
                                       CPPFLAGS="$CPPFLAGS"          \
                                       LDFLAGS="$LDFLAGS"             \
@@ -576,7 +600,7 @@ jobs:
           git clone -b 'feature/igc' --depth 1 https://github.com/emacs-mirror/emacs.git emacs-igc
           cd emacs-igc && sed -i '' '/darwin/ s/lncurses/lncursesw/g' configure.ac
           ./autogen.sh && ./configure CFLAGS='-O2 -g0 -flto=thin'   \
-                                      PKG_CONFIG='pkgconf -static'  \
+                                      PKG_CONFIG='/tmp/pkg-config-wrapper'  \
                                       PKG_CONFIG_PATH="$PKG_CONFIG_PATH" \
                                       CPPFLAGS="$CPPFLAGS"          \
                                       LDFLAGS="$LDFLAGS"             \
