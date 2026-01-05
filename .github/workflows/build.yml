@@ -520,6 +520,15 @@ jobs:
           echo "LDFLAGS=-L/usr/local/deps/lcms2/lib $LDFLAGS" >> $GITHUB_ENV
       - name: Install ImageMagick
         run: brew install imagemagick
+      - name: Setup ImageMagick environment
+        run: |
+          # Find Homebrew ImageMagick installation path
+          IMAGEMAGICK_PREFIX=$(brew --prefix imagemagick)
+          echo "PKG_CONFIG_PATH=${IMAGEMAGICK_PREFIX}/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
+          echo "CPPFLAGS=-I${IMAGEMAGICK_PREFIX}/include/ImageMagick-7 $CPPFLAGS" >> $GITHUB_ENV
+          echo "LDFLAGS=-L${IMAGEMAGICK_PREFIX}/lib $LDFLAGS" >> $GITHUB_ENV
+          echo "MAGICK_CFLAGS=-I${IMAGEMAGICK_PREFIX}/include/ImageMagick-7" >> $GITHUB_ENV
+          echo "MAGICK_LIBS=-L${IMAGEMAGICK_PREFIX}/lib -lMagickWand-7 -lMagickCore-7" >> $GITHUB_ENV
       - name: Setup upterm session
         if: github.event_name == 'workflow_dispatch' && github.event.inputs.debug == 'true'
         uses: owenthereal/action-upterm@v1
