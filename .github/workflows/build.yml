@@ -568,28 +568,29 @@ jobs:
                                       PKG_CONFIG_PATH="$PKG_CONFIG_PATH" \
                                       CPPFLAGS="$CPPFLAGS"          \
                                       LDFLAGS="$LDFLAGS"             \
+                                      --disable-silent-rules        \
                                       --disable-gc-mark-trace       \
-                                      --without-all                 \
-                                      --with-compress-install       \
-                                      --with-gif                    \
-                                      --with-gmp                    \
                                       --with-gnutls                 \
-                                      --with-imagemagick            \
-                                      --with-jpeg                   \
-                                      --with-lcms2                  \
-                                      --with-modules                \
-                                      --with-native-image-api       \
-                                      --with-ns                     \
+                                      --with-xml2                   \
+                                      --with-gif                    \
                                       --with-png                    \
+                                      --with-jpeg                   \
+                                      --with-tiff                   \
+                                      --with-webp                   \
+                                      --with-lcms2                  \
+                                      --with-native-image-api       \
                                       --with-rsvg                   \
-                                      --with-small-ja-dic           \
+                                      --with-imagemagick            \
+                                      --without-pop                 \
+                                      --without-dbus                \
+                                      --with-modules                \
+                                      --with-ns                     \
+                                      --with-compress-install       \
+                                      --with-gmp                    \
                                       --with-sqlite3                \
                                       --with-threads                \
-                                      --with-tiff                   \
                                       --with-toolkit-scroll-bars    \
                                       --with-tree-sitter            \
-                                      --with-webp                   \
-                                      --with-xml2                   \
                                       --with-zlib
           make -j4 && make install
           ditto nextstep/Emacs.app Emacs.app
@@ -603,30 +604,31 @@ jobs:
                                       PKG_CONFIG='/tmp/pkg-config-wrapper'  \
                                       PKG_CONFIG_PATH="$PKG_CONFIG_PATH" \
                                       CPPFLAGS="$CPPFLAGS"          \
-                                      LDFLAGS="$LDFLAGS"             \
+                                      LDFLAGS="$LDFLAGS"            \
+                                      --disable-silent-rules        \
                                       --disable-gc-mark-trace       \
-                                      --without-all                 \
-                                      --with-compress-install       \
-                                      --with-gif                    \
-                                      --with-gmp                    \
                                       --with-gnutls                 \
-                                      --with-imagemagick            \
-                                      --with-jpeg                   \
-                                      --with-lcms2                  \
-                                      --with-modules                \
-                                      --with-mps                    \
-                                      --with-native-image-api       \
-                                      --with-ns                     \
+                                      --with-xml2                   \
+                                      --with-gif                    \
                                       --with-png                    \
+                                      --with-jpeg                   \
+                                      --with-tiff                   \
+                                      --with-webp                   \
+                                      --with-lcms2                  \
+                                      --with-native-image-api       \
                                       --with-rsvg                   \
-                                      --with-small-ja-dic           \
+                                      --with-imagemagick            \
+                                      --without-pop                 \
+                                      --without-dbus                \
+                                      --with-modules                \
+                                      --with-ns                     \
+                                      --with-compress-install       \
+                                      --with-gmp                    \
+                                      --with-mps                    \
                                       --with-sqlite3                \
                                       --with-threads                \
-                                      --with-tiff                   \
                                       --with-toolkit-scroll-bars    \
                                       --with-tree-sitter            \
-                                      --with-webp                   \
-                                      --with-xml2                   \
                                       --with-zlib
           make -j4 && make install
           ditto nextstep/Emacs.app Emacs.app
