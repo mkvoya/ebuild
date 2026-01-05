@@ -530,6 +530,14 @@ jobs:
           echo "LDFLAGS=-L${IMAGEMAGICK_PREFIX}/lib $LDFLAGS" >> $GITHUB_ENV
           echo "MAGICK_CFLAGS=-I${IMAGEMAGICK_PREFIX}/include/ImageMagick-7" >> $GITHUB_ENV
           echo "MAGICK_LIBS=-L${IMAGEMAGICK_PREFIX}/lib -lMagickWand-7 -lMagickCore-7" >> $GITHUB_ENV
+      - name: Install libgccjit
+        run: brew install libgccjit
+      - name: Setup libgccjit environment
+        run: |
+          LIBGCCJIT_PREFIX=$(brew --prefix libgccjit)
+          echo "PKG_CONFIG_PATH=${LIBGCCJIT_PREFIX}/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
+          echo "CPPFLAGS=-I${LIBGCCJIT_PREFIX}/include $CPPFLAGS" >> $GITHUB_ENV
+          echo "LDFLAGS=-L${LIBGCCJIT_PREFIX}/lib $LDFLAGS" >> $GITHUB_ENV
       - name: Setup upterm session
         if: github.event_name == 'workflow_dispatch' && github.event.inputs.debug == 'true'
         uses: owenthereal/action-upterm@v1
