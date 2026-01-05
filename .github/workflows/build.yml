@@ -518,6 +518,8 @@ jobs:
           echo "PKG_CONFIG_PATH=/usr/local/deps/lcms2/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
           echo "CPPFLAGS=-I/usr/local/deps/lcms2/include $CPPFLAGS" >> $GITHUB_ENV
           echo "LDFLAGS=-L/usr/local/deps/lcms2/lib $LDFLAGS" >> $GITHUB_ENV
+      - name: Install ImageMagick
+        run: brew install imagemagick
       - name: Setup upterm session
         if: github.event_name == 'workflow_dispatch' && github.event.inputs.debug == 'true'
         uses: owenthereal/action-upterm@v1
