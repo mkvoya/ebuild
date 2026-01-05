@@ -685,7 +685,7 @@ jobs:
           curl -LO https://download.savannah.gnu.org/releases/freetype/freetype-2.14.1.tar.xz
           tar -Jxf freetype-2.14.1.tar.xz && cd freetype-2.14.1
           mkdir -p _build
-          meson setup _build --prefix=/usr/local/deps/freetype
+          meson setup _build --prefix=/usr/local/deps/freetype -Ddefault_library=static
           meson compile -C _build
           meson install -C _build
       - name: Save FreeType2 cache
@@ -699,32 +699,6 @@ jobs:
           echo "PKG_CONFIG_PATH=/usr/local/deps/freetype/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
           echo "CPPFLAGS=-I/usr/local/deps/freetype/include $CPPFLAGS" >> $GITHUB_ENV
           echo "LDFLAGS=-L/usr/local/deps/freetype/lib $LDFLAGS" >> $GITHUB_ENV
-      - name: Cache Pango
-        id: cache-pango
-        uses: actions/cache@v4
-        with:
-          path: /usr/local/deps/pango
-          key: pango-1.57.0-${{ runner.os }}
-      - name: Install Pango
-        if: steps.cache-pango.outputs.cache-hit != 'true'
-        run: |
-          curl -LO https://download.gnome.org/sources/pango/1.57/pango-1.57.0.tar.xz
-          tar -Jxf pango-1.57.0.tar.xz && cd pango-1.57.0
-          mkdir -p _build
-          meson setup _build --prefix=/usr/local/deps/pango
-          meson compile -C _build
-          meson install -C _build
-      - name: Save Pango cache
-        if: steps.cache-pango.outputs.cache-hit != 'true'
-        uses: actions/cache/save@v4
-        with:
-          path: /usr/local/deps/pango
-          key: pango-1.57.0-${{ runner.os }}
-      - name: Setup Pango environment
-        run: |
-          echo "PKG_CONFIG_PATH=/usr/local/deps/pango/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
-          echo "CPPFLAGS=-I/usr/local/deps/pango/include $CPPFLAGS" >> $GITHUB_ENV
-          echo "LDFLAGS=-L/usr/local/deps/pango/lib $LDFLAGS" >> $GITHUB_ENV
       - name: Cache Cairo
         id: cache-cairo
         uses: actions/cache@v4
@@ -737,7 +711,7 @@ jobs:
           curl -LO https://cairographics.org/releases/cairo-1.18.4.tar.xz
           tar -Jxf cairo-1.18.4.tar.xz && cd cairo-1.18.4
           mkdir -p _build
-          meson setup _build --prefix=/usr/local/deps/cairo
+          meson setup _build --prefix=/usr/local/deps/cairo -Ddefault_library=static
           meson compile -C _build
           meson install -C _build
       - name: Save Cairo cache
@@ -751,6 +725,32 @@ jobs:
           echo "PKG_CONFIG_PATH=/usr/local/deps/cairo/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
           echo "CPPFLAGS=-I/usr/local/deps/cairo/include $CPPFLAGS" >> $GITHUB_ENV
           echo "LDFLAGS=-L/usr/local/deps/cairo/lib $LDFLAGS" >> $GITHUB_ENV
+      - name: Cache Pango
+        id: cache-pango
+        uses: actions/cache@v4
+        with:
+          path: /usr/local/deps/pango
+          key: pango-1.57.0-${{ runner.os }}
+      - name: Install Pango
+        if: steps.cache-pango.outputs.cache-hit != 'true'
+        run: |
+          curl -LO https://download.gnome.org/sources/pango/1.57/pango-1.57.0.tar.xz
+          tar -Jxf pango-1.57.0.tar.xz && cd pango-1.57.0
+          mkdir -p _build
+          meson setup _build --prefix=/usr/local/deps/pango -Ddefault_library=static
+          meson compile -C _build
+          meson install -C _build
+      - name: Save Pango cache
+        if: steps.cache-pango.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: /usr/local/deps/pango
+          key: pango-1.57.0-${{ runner.os }}
+      - name: Setup Pango environment
+        run: |
+          echo "PKG_CONFIG_PATH=/usr/local/deps/pango/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
+          echo "CPPFLAGS=-I/usr/local/deps/pango/include $CPPFLAGS" >> $GITHUB_ENV
+          echo "LDFLAGS=-L/usr/local/deps/pango/lib $LDFLAGS" >> $GITHUB_ENV
       - name: Cache librsvg
         id: cache-librsvg
         uses: actions/cache@v4
@@ -770,7 +770,7 @@ jobs:
           # Install cargo-c which is required for librsvg (provides cargo-cbuild)
           cargo install cargo-c
           mkdir -p _build
-          meson setup _build --prefix=/usr/local/deps/librsvg -Ddocs=disabled -Dintrospection=disabled -Dvala=disabled
+          meson setup _build --prefix=/usr/local/deps/librsvg -Ddefault_library=static -Ddocs=disabled -Dintrospection=disabled -Dvala=disabled
           meson compile -C _build
           meson install -C _build
       - name: Save librsvg cache
