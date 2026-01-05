@@ -559,11 +559,11 @@ jobs:
       - name: Build Emacs
         run: |
           git clone --depth 1 https://github.com/emacs-mirror/emacs.git
-          cd emacs && sed -i '' '/darwin/ s/lncurses/lncursesw/g' configure.ac
+          cd emacs
           patch -p1 < ../patches/system-appearance.patch
           patch -p1 < ../patches/ksqsf-smooth-cursor.patch
           patch -p1 < ../patches/round-undecorated-frame.patch
-          ./autogen.sh && ./configure CFLAGS='-O2 -g0 -flto=thin'   \
+          ./autogen.sh && ./configure CFLAGS='-O2 -g0 -flto=thin -DFD_SETSIZE=10000 -DDARWIN_UNLIMITED_SELECT'   \
                                       PKG_CONFIG='/tmp/pkg-config-wrapper'  \
                                       PKG_CONFIG_PATH="$PKG_CONFIG_PATH" \
                                       CPPFLAGS="$CPPFLAGS"          \
@@ -585,6 +585,7 @@ jobs:
                                       --without-dbus                \
                                       --with-modules                \
                                       --with-ns                     \
+                                      --with-xwidgets               \
                                       --with-compress-install       \
                                       --with-gmp                    \
                                       --with-sqlite3                \
@@ -599,8 +600,11 @@ jobs:
       - name: Build Emacs with MPS
         run: |
           git clone -b 'feature/igc' --depth 1 https://github.com/emacs-mirror/emacs.git emacs-igc
-          cd emacs-igc && sed -i '' '/darwin/ s/lncurses/lncursesw/g' configure.ac
-          ./autogen.sh && ./configure CFLAGS='-O2 -g0 -flto=thin'   \
+          cd emacs-igc
+          patch -p1 < ../patches/system-appearance.patch
+          patch -p1 < ../patches/ksqsf-smooth-cursor.patch
+          patch -p1 < ../patches/round-undecorated-frame.patch
+          ./autogen.sh && ./configure CFLAGS='-O2 -g0 -flto=thin -DFD_SETSIZE=10000 -DDARWIN_UNLIMITED_SELECT'   \
                                       PKG_CONFIG='/tmp/pkg-config-wrapper'  \
                                       PKG_CONFIG_PATH="$PKG_CONFIG_PATH" \
                                       CPPFLAGS="$CPPFLAGS"          \
@@ -622,6 +626,7 @@ jobs:
                                       --without-dbus                \
                                       --with-modules                \
                                       --with-ns                     \
+                                      --with-xwidgets               \
                                       --with-compress-install       \
                                       --with-gmp                    \
                                       --with-mps                    \
