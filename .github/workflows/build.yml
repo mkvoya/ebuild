@@ -736,4 +736,3 @@ jobs:
         with:
           name: Emacs-libgccjit-${{ env.libgccjit_version }}
           path: emacs-libgccjit/Emacs-libgccjit.tar.xz
-      - name: Upload Emacs icons
