@@ -98,10 +98,10 @@ jobs:
           echo "PKG_CONFIG_PATH=$(brew --prefix librsvg)/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
           echo "CPPFLAGS=-I$(brew --prefix librsvg)/include $CPPFLAGS" >> $GITHUB_ENV
           echo "LDFLAGS=-L$(brew --prefix librsvg)/lib $LDFLAGS" >> $GITHUB_ENV
-          brew install libwebp
-          echo "PKG_CONFIG_PATH=$(brew --prefix libwebp)/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
-          echo "CPPFLAGS=-I$(brew --prefix libwebp)/include $CPPFLAGS" >> $GITHUB_ENV
-          echo "LDFLAGS=-L$(brew --prefix libwebp)/lib $LDFLAGS" >> $GITHUB_ENV
+          brew install webp
+          echo "PKG_CONFIG_PATH=$(brew --prefix webp)/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
+          echo "CPPFLAGS=-I$(brew --prefix webp)/include $CPPFLAGS" >> $GITHUB_ENV
+          echo "LDFLAGS=-L$(brew --prefix webp)/lib $LDFLAGS" >> $GITHUB_ENV
           brew install lcms2
           echo "PKG_CONFIG_PATH=$(brew --prefix lcms2)/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
           echo "CPPFLAGS=-I$(brew --prefix lcms2)/include $CPPFLAGS" >> $GITHUB_ENV
