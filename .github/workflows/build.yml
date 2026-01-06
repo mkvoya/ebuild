@@ -614,9 +614,20 @@ jobs:
                                       --with-tree-sitter            \
                                       --with-zlib
           make -j4 && make install
+          ditto ../icons/Assets.car nextstep/Emacs.app/Contents/Resources/Assets.car
+          # Set icon file reference
+          /usr/libexec/PlistBuddy -c "Delete :CFBundleIconName" nextstep/Emacs.app/Contents/Info.plist 2>/dev/null || true
+          /usr/libexec/PlistBuddy -c "Add :CFBundleIconName string elrumo3" nextstep/Emacs.app/Contents/Info.plist
+          codesign --force --deep --sign - nextstep/Emacs.app
+          codesign --verify --deep --strict nextstep/Emacs.app
           ditto nextstep/Emacs.app Emacs.app
           echo version=$(Emacs.app/Contents/MacOS/Emacs --version | sed -nE 's/^GNU Emacs ([0-9.]+).*/\1/p') >> $GITHUB_ENV
           tar -Jcf Emacs.tar.xz Emacs.app
+      - name: Upload Emacs
+        uses: actions/upload-artifact@v4
+        with:
+          name: Emacs-${{ env.version }}
+          path: emacs/Emacs.tar.xz
       - name: Build Emacs with MPS
         run: |
           git clone -b 'feature/igc' --depth 1 https://github.com/emacs-mirror/emacs.git emacs-igc
@@ -657,9 +668,20 @@ jobs:
                                       --with-tree-sitter            \
                                       --with-zlib
           make -j4 && make install
+          ditto ../icons/Assets.car nextstep/Emacs.app/Contents/Resources/Assets.car
+          # Set icon file reference
+          /usr/libexec/PlistBuddy -c "Delete :CFBundleIconName" nextstep/Emacs.app/Contents/Info.plist 2>/dev/null || true
+          /usr/libexec/PlistBuddy -c "Add :CFBundleIconName string elrumo3" nextstep/Emacs.app/Contents/Info.plist
+          codesign --force --deep --sign - nextstep/Emacs.app
+          codesign --verify --deep --strict nextstep/Emacs.app
           ditto nextstep/Emacs.app Emacs.app
           echo igc_version=$(Emacs.app/Contents/MacOS/Emacs --version | sed -nE 's/^GNU Emacs ([0-9.]+).*/\1/p') >> $GITHUB_ENV
           tar -Jcf Emacs-MPS.tar.xz Emacs.app
+      - name: Upload Emacs with MPS
+        uses: actions/upload-artifact@v4
+        with:
+          name: Emacs-MPS-${{ env.igc_version }}
+          path: emacs-igc/Emacs-MPS.tar.xz
       - name: Build Emacs with libgccjit
         run: |
           git clone --depth 1 https://github.com/emacs-mirror/emacs.git emacs-libgccjit
@@ -700,21 +722,18 @@ jobs:
                                       --with-native-compilation=yes \
                                       --with-zlib
           make -j4 && make install
+          ditto ../icons/Assets.car nextstep/Emacs.app/Contents/Resources/Assets.car
+          # Set icon file reference
+          /usr/libexec/PlistBuddy -c "Delete :CFBundleIconName" nextstep/Emacs.app/Contents/Info.plist 2>/dev/null || true
+          /usr/libexec/PlistBuddy -c "Add :CFBundleIconName string elrumo3" nextstep/Emacs.app/Contents/Info.plist
+          codesign --force --deep --sign - nextstep/Emacs.app
+          codesign --verify --deep --strict nextstep/Emacs.app
           ditto nextstep/Emacs.app Emacs.app
           echo libgccjit_version=$(Emacs.app/Contents/MacOS/Emacs --version | sed -nE 's/^GNU Emacs ([0-9.]+).*/\1/p') >> $GITHUB_ENV
           tar -Jcf Emacs-libgccjit.tar.xz Emacs.app
-      - name: Upload Emacs
-        uses: actions/upload-artifact@v4
-        with:
-          name: Emacs-${{ env.version }}
-          path: emacs/Emacs.tar.xz
-      - name: Upload Emacs with MPS
-        uses: actions/upload-artifact@v4
-        with:
-          name: Emacs-MPS-${{ env.igc_version }}
-          path: emacs-igc/Emacs-MPS.tar.xz
       - name: Upload Emacs with libgccjit
         uses: actions/upload-artifact@v4
         with:
           name: Emacs-libgccjit-${{ env.libgccjit_version }}
           path: emacs-libgccjit/Emacs-libgccjit.tar.xz
+      - name: Upload Emacs icons
