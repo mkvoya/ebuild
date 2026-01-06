@@ -31,11 +31,29 @@ jobs:
           brew install pkgconf
           brew install texinfo
           brew install libiconv
+          echo "PKG_CONFIG_PATH=$(brew --prefix libiconv)/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
+          echo "CPPFLAGS=-I$(brew --prefix libiconv)/include $CPPFLAGS" >> $GITHUB_ENV
+          echo "LDFLAGS=-L$(brew --prefix libiconv)/lib $LDFLAGS" >> $GITHUB_ENV
           brew install libunistring
+          echo "PKG_CONFIG_PATH=$(brew --prefix libunistring)/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
+          echo "CPPFLAGS=-I$(brew --prefix libunistring)/include $CPPFLAGS" >> $GITHUB_ENV
+          echo "LDFLAGS=-L$(brew --prefix libunistring)/lib $LDFLAGS" >> $GITHUB_ENV
           brew install gettext
+          echo "PKG_CONFIG_PATH=$(brew --prefix gettext)/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
+          echo "CPPFLAGS=-I$(brew --prefix gettext)/include $CPPFLAGS" >> $GITHUB_ENV
+          echo "LDFLAGS=-L$(brew --prefix gettext)/lib $LDFLAGS" >> $GITHUB_ENV
           brew install ncurses
+          echo "PKG_CONFIG_PATH=$(brew --prefix ncurses)/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
+          echo "CPPFLAGS=-I$(brew --prefix ncurses)/include $CPPFLAGS" >> $GITHUB_ENV
+          echo "LDFLAGS=-L$(brew --prefix ncurses)/lib $LDFLAGS" >> $GITHUB_ENV
           brew install zlib
+          echo "PKG_CONFIG_PATH=$(brew --prefix zlib)/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
+          echo "CPPFLAGS=-I$(brew --prefix zlib)/include $CPPFLAGS" >> $GITHUB_ENV
+          echo "LDFLAGS=-L$(brew --prefix zlib)/lib $LDFLAGS" >> $GITHUB_ENV
           brew install libxml2
+          echo "PKG_CONFIG_PATH=$(brew --prefix libxml2)/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
+          echo "CPPFLAGS=-I$(brew --prefix libxml2)/include $CPPFLAGS" >> $GITHUB_ENV
+          echo "LDFLAGS=-L$(brew --prefix libxml2)/lib $LDFLAGS" >> $GITHUB_ENV
           brew install gmp
           echo "PKG_CONFIG_PATH=$(brew --prefix gmp)/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
           echo "CPPFLAGS=-I$(brew --prefix gmp)/include $CPPFLAGS" >> $GITHUB_ENV
@@ -45,28 +63,65 @@ jobs:
           echo "CPPFLAGS=-I$(brew --prefix nettle)/include $CPPFLAGS" >> $GITHUB_ENV
           echo "LDFLAGS=-L$(brew --prefix nettle)/lib $LDFLAGS" >> $GITHUB_ENV
           brew install libidn2
+          echo "PKG_CONFIG_PATH=$(brew --prefix libidn2)/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
+          echo "CPPFLAGS=-I$(brew --prefix libidn2)/include $CPPFLAGS" >> $GITHUB_ENV
+          echo "LDFLAGS=-L$(brew --prefix libidn2)/lib $LDFLAGS" >> $GITHUB_ENV 
           brew install gnutls
+          echo "PKG_CONFIG_PATH=$(brew --prefix gnutls)/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
+          echo "CPPFLAGS=-I$(brew --prefix gnutls)/include $CPPFLAGS" >> $GITHUB_ENV
+          echo "LDFLAGS=-L$(brew --prefix gnutls)/lib $LDFLAGS" >> $GITHUB_ENV
           brew install tree-sitter
+          echo "PKG_CONFIG_PATH=$(brew --prefix tree-sitter)/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
+          echo "CPPFLAGS=-I$(brew --prefix tree-sitter)/include $CPPFLAGS" >> $GITHUB_ENV
+          echo "LDFLAGS=-L$(brew --prefix tree-sitter)/lib $LDFLAGS" >> $GITHUB_ENV
           brew install gzip
+          echo "PKG_CONFIG_PATH=$(brew --prefix gzip)/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
+          echo "CPPFLAGS=-I$(brew --prefix gzip)/include $CPPFLAGS" >> $GITHUB_ENV
+          echo "LDFLAGS=-L$(brew --prefix gzip)/lib $LDFLAGS" >> $GITHUB_ENV
           brew install libjpeg
+          echo "PKG_CONFIG_PATH=$(brew --prefix libjpeg)/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
+          echo "CPPFLAGS=-I$(brew --prefix libjpeg)/include $CPPFLAGS" >> $GITHUB_ENV
+          echo "LDFLAGS=-L$(brew --prefix libjpeg)/lib $LDFLAGS" >> $GITHUB_ENV
           brew install libtiff
-          brew install libgif
+          echo "PKG_CONFIG_PATH=$(brew --prefix libtiff)/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
+          echo "CPPFLAGS=-I$(brew --prefix libtiff)/include $CPPFLAGS" >> $GITHUB_ENV
+          echo "LDFLAGS=-L$(brew --prefix libtiff)/lib $LDFLAGS" >> $GITHUB_ENV
+          brew install giflib
+          echo "PKG_CONFIG_PATH=$(brew --prefix giflib)/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
+          echo "CPPFLAGS=-I$(brew --prefix giflib)/include $CPPFLAGS" >> $GITHUB_ENV
+          echo "LDFLAGS=-L$(brew --prefix giflib)/lib $LDFLAGS" >> $GITHUB_ENV
           brew install libpng
+          echo "PKG_CONFIG_PATH=$(brew --prefix libpng)/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
+          echo "CPPFLAGS=-I$(brew --prefix libpng)/include $CPPFLAGS" >> $GITHUB_ENV
+          echo "LDFLAGS=-L$(brew --prefix libpng)/lib $LDFLAGS" >> $GITHUB_ENV
           brew install librsvg
+          echo "PKG_CONFIG_PATH=$(brew --prefix librsvg)/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
+          echo "CPPFLAGS=-I$(brew --prefix librsvg)/include $CPPFLAGS" >> $GITHUB_ENV
+          echo "LDFLAGS=-L$(brew --prefix librsvg)/lib $LDFLAGS" >> $GITHUB_ENV
           brew install libwebp
+          echo "PKG_CONFIG_PATH=$(brew --prefix libwebp)/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
+          echo "CPPFLAGS=-I$(brew --prefix libwebp)/include $CPPFLAGS" >> $GITHUB_ENV
+          echo "LDFLAGS=-L$(brew --prefix libwebp)/lib $LDFLAGS" >> $GITHUB_ENV
           brew install lcms2
+          echo "PKG_CONFIG_PATH=$(brew --prefix lcms2)/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
+          echo "CPPFLAGS=-I$(brew --prefix lcms2)/include $CPPFLAGS" >> $GITHUB_ENV
+          echo "LDFLAGS=-L$(brew --prefix lcms2)/lib $LDFLAGS" >> $GITHUB_ENV
           brew install sqlite3
+          echo "PKG_CONFIG_PATH=$(brew --prefix sqlite3)/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
+          echo "CPPFLAGS=-I$(brew --prefix sqlite3)/include $CPPFLAGS" >> $GITHUB_ENV
+          echo "LDFLAGS=-L$(brew --prefix sqlite3)/lib $LDFLAGS" >> $GITHUB_ENV
           brew install imagemagick
+          echo "PKG_CONFIG_PATH=$(brew --prefix imagemagick)/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
+          echo "CPPFLAGS=-I$(brew --prefix imagemagick)/include $CPPFLAGS" >> $GITHUB_ENV
+          echo "LDFLAGS=-L$(brew --prefix imagemagick)/lib $LDFLAGS" >> $GITHUB_ENV
           brew install mailutils
+          echo "PKG_CONFIG_PATH=$(brew --prefix mailutils)/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
+          echo "CPPFLAGS=-I$(brew --prefix mailutils)/include $CPPFLAGS" >> $GITHUB_ENV
+          echo "LDFLAGS=-L$(brew --prefix mailutils)/lib $LDFLAGS" >> $GITHUB_ENV
           brew install libgccjit
-          MAILUTILS_PREFIX=$(brew --prefix mailutils)
-          echo "PKG_CONFIG_PATH=${MAILUTILS_PREFIX}/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
-          echo "CPPFLAGS=-I${MAILUTILS_PREFIX}/include $CPPFLAGS" >> $GITHUB_ENV
-          echo "LDFLAGS=-L${MAILUTILS_PREFIX}/lib $LDFLAGS" >> $GITHUB_ENV
-          LIBGCCJIT_PREFIX=$(brew --prefix libgccjit)
-          echo "PKG_CONFIG_PATH=${LIBGCCJIT_PREFIX}/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
-          echo "CPPFLAGS=-I${LIBGCCJIT_PREFIX}/include $CPPFLAGS" >> $GITHUB_ENV
-          echo "LDFLAGS=-L${LIBGCCJIT_PREFIX}/lib $LDFLAGS" >> $GITHUB_ENV
+          echo "PKG_CONFIG_PATH=$(brew --prefix libgccjit)/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
+          echo "CPPFLAGS=-I$(brew --prefix libgccjit)/include $CPPFLAGS" >> $GITHUB_ENV
+          echo "LDFLAGS=-L$(brew --prefix libgccjit)/lib $LDFLAGS" >> $GITHUB_ENV
       - name: Setup upterm session
         if: github.event_name == 'workflow_dispatch' && github.event.inputs.debug == 'true'
         uses: owenthereal/action-upterm@v1
