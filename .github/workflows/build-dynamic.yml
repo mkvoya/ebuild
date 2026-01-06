@@ -1,0 +1,256 @@
+name: MacOS Build for GNU Emacs (dylib)
+
+on:
+  workflow_dispatch:
+    inputs:
+      debug:
+        description: 'Enable debug session'
+        required: false
+        default: false
+        type: boolean
+  schedule:
+    - cron: '0 0 * * *'
+
+jobs:
+  build:
+    runs-on: macos-26
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 1
+  
+      - name: Install dependencies
+        run: |
+          brew update
+          brew upgrade
+          brew install m4
+          brew install autoconf
+          brew install automake
+          brew install libtool
+          brew install pkgconf
+          brew install texinfo
+          brew install libiconv
+          brew install libunistring
+          brew install gettext
+          brew install ncurses
+          brew install zlib
+          brew install libxml2
+          brew install gmp
+          echo "PKG_CONFIG_PATH=$(brew --prefix gmp)/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
+          echo "CPPFLAGS=-I$(brew --prefix gmp)/include $CPPFLAGS" >> $GITHUB_ENV
+          echo "LDFLAGS=-L$(brew --prefix gmp)/lib $LDFLAGS" >> $GITHUB_ENV
+          brew install nettle
+          echo "PKG_CONFIG_PATH=$(brew --prefix nettle)/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
+          echo "CPPFLAGS=-I$(brew --prefix nettle)/include $CPPFLAGS" >> $GITHUB_ENV
+          echo "LDFLAGS=-L$(brew --prefix nettle)/lib $LDFLAGS" >> $GITHUB_ENV
+          brew install libidn2
+          brew install gnutls
+          brew install tree-sitter
+          brew install gzip
+          brew install libjpeg
+          brew install libtiff
+          brew install libgif
+          brew install libpng
+          brew install librsvg
+          brew install libwebp
+          brew install lcms2
+          brew install sqlite3
+          brew install imagemagick
+          brew install mailutils
+          brew install libgccjit
+          MAILUTILS_PREFIX=$(brew --prefix mailutils)
+          echo "PKG_CONFIG_PATH=${MAILUTILS_PREFIX}/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
+          echo "CPPFLAGS=-I${MAILUTILS_PREFIX}/include $CPPFLAGS" >> $GITHUB_ENV
+          echo "LDFLAGS=-L${MAILUTILS_PREFIX}/lib $LDFLAGS" >> $GITHUB_ENV
+          LIBGCCJIT_PREFIX=$(brew --prefix libgccjit)
+          echo "PKG_CONFIG_PATH=${LIBGCCJIT_PREFIX}/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
+          echo "CPPFLAGS=-I${LIBGCCJIT_PREFIX}/include $CPPFLAGS" >> $GITHUB_ENV
+          echo "LDFLAGS=-L${LIBGCCJIT_PREFIX}/lib $LDFLAGS" >> $GITHUB_ENV
+      - name: Setup upterm session
+        if: github.event_name == 'workflow_dispatch' && github.event.inputs.debug == 'true'
+        uses: owenthereal/action-upterm@v1
+      - name: Create pkg-config wrapper for selective static linking
+        run: |
+          cat > /tmp/pkg-config-wrapper << 'EOF'
+          #!/bin/bash
+          # Wrapper to use static linking for all libraries except librsvg and imagemagick
+          # Check if this is librsvg or imagemagick by examining all arguments
+          USE_DYNAMIC=false
+          for arg in "$@"; do
+            if [[ "$arg" =~ (librsvg|rsvg|Magick|ImageMagick) ]]; then
+              USE_DYNAMIC=true
+              break
+            fi
+          done
+          
+          if [ "$USE_DYNAMIC" = true ]; then
+            # Use dynamic linking for librsvg and imagemagick
+            exec pkgconf "$@"
+          else
+            # Use static linking for other libraries
+            exec pkgconf -static "$@"
+          fi
+          EOF
+          chmod +x /tmp/pkg-config-wrapper
+      - name: Build Emacs
+        run: |
+          git clone --depth 1 https://github.com/emacs-mirror/emacs.git
+          cd emacs
+          patch -p1 < ../patches/system-appearance.patch
+          patch -p1 < ../patches/ksqsf-smooth-cursor.patch
+          patch -p1 < ../patches/round-undecorated-frame.patch
+          ./autogen.sh && ./configure CFLAGS='-O2 -g0 -flto=thin -DFD_SETSIZE=10000 -DDARWIN_UNLIMITED_SELECT'   \
+                                      PKG_CONFIG='/tmp/pkg-config-wrapper'  \
+                                      PKG_CONFIG_PATH="$PKG_CONFIG_PATH" \
+                                      CPPFLAGS="$CPPFLAGS"          \
+                                      LDFLAGS="$LDFLAGS"             \
+                                      --disable-silent-rules        \
+                                      --disable-gc-mark-trace       \
+                                      --with-gnutls                 \
+                                      --with-xml2                   \
+                                      --with-gif                    \
+                                      --with-png                    \
+                                      --with-jpeg                   \
+                                      --with-tiff                   \
+                                      --with-webp                   \
+                                      --with-lcms2                  \
+                                      --with-native-image-api       \
+                                      --with-rsvg                   \
+                                      --with-imagemagick            \
+                                      --without-pop                 \
+                                      --without-dbus                \
+                                      --with-modules                \
+                                      --with-ns                     \
+                                      --with-xwidgets               \
+                                      --with-compress-install       \
+                                      --with-libgmp                 \
+                                      --with-mailutils              \
+                                      --with-sqlite3                \
+                                      --with-threads                \
+                                      --with-toolkit-scroll-bars    \
+                                      --with-tree-sitter            \
+                                      --with-zlib
+          make -j4 && make install
+          ditto ../icons/Assets.car nextstep/Emacs.app/Contents/Resources/Assets.car
+          # Set icon file reference
+          /usr/libexec/PlistBuddy -c "Delete :CFBundleIconName" nextstep/Emacs.app/Contents/Info.plist 2>/dev/null || true
+          /usr/libexec/PlistBuddy -c "Add :CFBundleIconName string elrumo3" nextstep/Emacs.app/Contents/Info.plist
+          codesign --force --deep --sign - nextstep/Emacs.app
+          codesign --verify --deep --strict nextstep/Emacs.app
+          ditto nextstep/Emacs.app Emacs.app
+          echo version=$(Emacs.app/Contents/MacOS/Emacs --version | sed -nE 's/^GNU Emacs ([0-9.]+).*/\1/p') >> $GITHUB_ENV
+          tar -Jcf Emacs.tar.xz Emacs.app
+      - name: Upload Emacs
+        uses: actions/upload-artifact@v4
+        with:
+          name: Emacs-${{ env.version }}
+          path: emacs/Emacs.tar.xz
+      - name: Build Emacs with MPS
+        run: |
+          git clone -b 'feature/igc' --depth 1 https://github.com/emacs-mirror/emacs.git emacs-igc
+          cd emacs-igc
+          patch -p1 < ../patches/system-appearance.patch
+          patch -p1 < ../patches/ksqsf-smooth-cursor.patch
+          patch -p1 < ../patches/round-undecorated-frame.patch
+          ./autogen.sh && ./configure CFLAGS='-O2 -g0 -flto=thin -DFD_SETSIZE=10000 -DDARWIN_UNLIMITED_SELECT'   \
+                                      PKG_CONFIG='/tmp/pkg-config-wrapper'  \
+                                      PKG_CONFIG_PATH="$PKG_CONFIG_PATH" \
+                                      CPPFLAGS="$CPPFLAGS"          \
+                                      LDFLAGS="$LDFLAGS"            \
+                                      --disable-silent-rules        \
+                                      --disable-gc-mark-trace       \
+                                      --with-gnutls                 \
+                                      --with-xml2                   \
+                                      --with-gif                    \
+                                      --with-png                    \
+                                      --with-jpeg                   \
+                                      --with-tiff                   \
+                                      --with-webp                   \
+                                      --with-lcms2                  \
+                                      --with-native-image-api       \
+                                      --with-rsvg                   \
+                                      --with-imagemagick            \
+                                      --without-pop                 \
+                                      --without-dbus                \
+                                      --with-modules                \
+                                      --with-ns                     \
+                                      --with-xwidgets               \
+                                      --with-compress-install       \
+                                      --with-libgmp                 \
+                                      --with-mailutils              \
+                                      --with-mps                    \
+                                      --with-sqlite3                \
+                                      --with-threads                \
+                                      --with-toolkit-scroll-bars    \
+                                      --with-tree-sitter            \
+                                      --with-zlib
+          make -j4 && make install
+          ditto ../icons/Assets.car nextstep/Emacs.app/Contents/Resources/Assets.car
+          # Set icon file reference
+          /usr/libexec/PlistBuddy -c "Delete :CFBundleIconName" nextstep/Emacs.app/Contents/Info.plist 2>/dev/null || true
+          /usr/libexec/PlistBuddy -c "Add :CFBundleIconName string elrumo3" nextstep/Emacs.app/Contents/Info.plist
+          codesign --force --deep --sign - nextstep/Emacs.app
+          codesign --verify --deep --strict nextstep/Emacs.app
+          ditto nextstep/Emacs.app Emacs.app
+          echo igc_version=$(Emacs.app/Contents/MacOS/Emacs --version | sed -nE 's/^GNU Emacs ([0-9.]+).*/\1/p') >> $GITHUB_ENV
+          tar -Jcf Emacs-MPS.tar.xz Emacs.app
+      - name: Upload Emacs with MPS
+        uses: actions/upload-artifact@v4
+        with:
+          name: Emacs-MPS-${{ env.igc_version }}
+          path: emacs-igc/Emacs-MPS.tar.xz
+      - name: Build Emacs with libgccjit
+        run: |
+          git clone --depth 1 https://github.com/emacs-mirror/emacs.git emacs-libgccjit
+          cd emacs-libgccjit
+          patch -p1 < ../patches/system-appearance.patch
+          patch -p1 < ../patches/ksqsf-smooth-cursor.patch
+          patch -p1 < ../patches/round-undecorated-frame.patch
+          ./autogen.sh && ./configure CFLAGS='-O2 -g0 -flto=thin -DFD_SETSIZE=10000 -DDARWIN_UNLIMITED_SELECT'   \
+                                      PKG_CONFIG='/tmp/pkg-config-wrapper'  \
+                                      PKG_CONFIG_PATH="$PKG_CONFIG_PATH" \
+                                      CPPFLAGS="$CPPFLAGS"          \
+                                      LDFLAGS="$LDFLAGS"             \
+                                      --disable-silent-rules        \
+                                      --disable-gc-mark-trace       \
+                                      --with-gnutls                 \
+                                      --with-xml2                   \
+                                      --with-gif                    \
+                                      --with-png                    \
+                                      --with-jpeg                   \
+                                      --with-tiff                   \
+                                      --with-webp                   \
+                                      --with-lcms2                  \
+                                      --with-native-image-api       \
+                                      --with-rsvg                   \
+                                      --with-imagemagick            \
+                                      --without-pop                 \
+                                      --without-dbus                \
+                                      --with-modules                \
+                                      --with-ns                     \
+                                      --with-xwidgets               \
+                                      --with-compress-install       \
+                                      --with-libgmp                 \
+                                      --with-mailutils              \
+                                      --with-sqlite3                \
+                                      --with-threads                \
+                                      --with-toolkit-scroll-bars    \
+                                      --with-tree-sitter            \
+                                      --with-native-compilation=yes \
+                                      --with-zlib
+          make -j4 && make install
+          ditto ../icons/Assets.car nextstep/Emacs.app/Contents/Resources/Assets.car
+          # Set icon file reference
+          /usr/libexec/PlistBuddy -c "Delete :CFBundleIconName" nextstep/Emacs.app/Contents/Info.plist 2>/dev/null || true
+          /usr/libexec/PlistBuddy -c "Add :CFBundleIconName string elrumo3" nextstep/Emacs.app/Contents/Info.plist
+          codesign --force --deep --sign - nextstep/Emacs.app
+          codesign --verify --deep --strict nextstep/Emacs.app
+          ditto nextstep/Emacs.app Emacs.app
+          echo libgccjit_version=$(Emacs.app/Contents/MacOS/Emacs --version | sed -nE 's/^GNU Emacs ([0-9.]+).*/\1/p') >> $GITHUB_ENV
+          tar -Jcf Emacs-libgccjit.tar.xz Emacs.app
+      - name: Upload Emacs with libgccjit
+        uses: actions/upload-artifact@v4
+        with:
+          name: Emacs-libgccjit-${{ env.libgccjit_version }}
+          path: emacs-libgccjit/Emacs-libgccjit.tar.xz
