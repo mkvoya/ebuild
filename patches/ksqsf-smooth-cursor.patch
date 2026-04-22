@@ -1,6 +1,6 @@
-From ebfa4855d7a323ebc3424936d6a3df812f74967a Mon Sep 17 00:00:00 2001
+From 02fd02daaceacd60f3e10446729f905f4b18de6e Mon Sep 17 00:00:00 2001
 From: Mingkai Dong <mk@dong.mk>
-Date: Sat, 5 Apr 2025 00:27:15 +0800
+Date: Wed, 22 Apr 2026 15:49:40 +0800
 Subject: [PATCH] Add smooth cursor animation
 
 This adds and extends the patch from ksqsf.
@@ -15,7 +15,7 @@ Co-Authored-By: ksqsf <justksqsf@gmail.com>
  3 files changed, 67 insertions(+)
 
 diff --git a/lisp/term/ns-win.el b/lisp/term/ns-win.el
-index 46639f2422b..8c606c441af 100644
+index f78e75b743e..3f6f8acc351 100644
 --- a/lisp/term/ns-win.el
 +++ b/lisp/term/ns-win.el
 @@ -65,6 +65,13 @@ x-command-line-resources
@@ -33,7 +33,7 @@ index 46639f2422b..8c606c441af 100644
    (setq unread-command-events (append unread-command-events
                                        (if temp '(ns-open-temp-file)
 diff --git a/src/nsterm.h b/src/nsterm.h
-index 2abf402f8bc..33338370537 100644
+index 610ca4c4acc..f993ffcc58a 100644
 --- a/src/nsterm.h
 +++ b/src/nsterm.h
 @@ -485,6 +485,7 @@ #define NSTRACE_UNSILENCE()
@@ -45,7 +45,7 @@ index 2abf402f8bc..33338370537 100644
  
  /* AppKit-side interface.  */
 diff --git a/src/nsterm.m b/src/nsterm.m
-index 5514a693c86..95238209356 100644
+index 0dbb59344a3..62907d4c27d 100644
 --- a/src/nsterm.m
 +++ b/src/nsterm.m
 @@ -44,6 +44,7 @@ Updated by Christian Limpach (chris@nice.ch)
@@ -61,10 +61,10 @@ index 5514a693c86..95238209356 100644
  #include <Carbon/Carbon.h>
  #include <IOSurface/IOSurface.h>
 +#include <QuartzCore/QuartzCore.h>
- #endif
- 
- static EmacsMenu *dockMenu;
-@@ -3016,6 +3018,12 @@ Hide the window (X11 semantics)
+ /* ApplicationServices provides the macOS accessibility Zoom API
+    UAZoomEnabled and UAZoomChangeFocus (UniversalAccess framework).
+    Carbon.h already pulls in ApplicationServices on most SDK versions,
+@@ -3277,6 +3279,12 @@ Hide the window (X11 semantics)
    ns_unfocus (f);
  }
  
@@ -77,9 +77,9 @@ index 5514a693c86..95238209356 100644
  
  static void
  ns_draw_window_cursor (struct window *w, struct glyph_row *glyph_row,
-@@ -3101,6 +3109,45 @@ Note that CURSOR_WIDTH is meaningful only for (h)bar cursors.
-   /* Prevent the cursor from being drawn outside the text area.  */
-   r = NSIntersectionRect (r, ns_row_rect (w, glyph_row, TEXT_AREA));
+@@ -3372,6 +3380,45 @@ Note that CURSOR_WIDTH is meaningful only for (h)bar cursors.
+     ns_UAZoom_cursor_rect_new = r;
+ #endif
  
 +  /* We use the CA layer as a temporary animation layer. */
 +  EmacsView *view = FRAME_NS_VIEW (f);
@@ -123,7 +123,7 @@ index 5514a693c86..95238209356 100644
    ns_focus (f, NULL, 0);
  
    NSGraphicsContext *ctx = [NSGraphicsContext currentContext];
-@@ -9381,6 +9428,18 @@ - (instancetype) initWithEmacsFrame: (struct frame *) f
+@@ -9739,6 +9786,18 @@ - (instancetype) initWithEmacsFrame: (struct frame *) f
        [[self contentView] addSubview:view];
        [self makeFirstResponder:view];
  
@@ -143,5 +143,5 @@ index 5514a693c86..95238209356 100644
  #if MAC_OS_X_VERSION_MAX_ALLOWED > 1090
        if ([self respondsToSelector: @selector(useOptimizedDrawing:)])
 -- 
-2.49.0
+2.52.0
 
