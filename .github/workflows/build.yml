@@ -27,7 +27,8 @@ jobs:
           echo "DEPS_PREFIX=/usr/local/deps" >> $GITHUB_ENV
           echo "DEPS_BASE=/usr/local/deps" >> $GITHUB_ENV
           brew update
-          brew upgrade
+          brew unlink ruby@3.4 || true
+          brew upgrade || true
           brew install m4
           brew install autoconf
           brew install automake
