@@ -1,20 +1,19 @@
-[![MacOS Build for GNU Emacs](https://github.com/RadioNoiseE/ebuild/actions/workflows/build.yml/badge.svg)](https://github.com/RadioNoiseE/ebuild/actions/workflows/build.yml)
+[![MacOS Build for GNU Emacs](https://github.com/mkvoya/ebuild/actions/workflows/build.yml/badge.svg)](https://github.com/mkvoya/ebuild/actions/workflows/build.yml)
 
-This repository automatically builds GNU Emacs with and without the
-Memory Pool System for Darwin every day at UTC 0:00, directly from
-upstream git sources. This build is intended for Emacs developers who
-want to test the bleeding-edge version. Please report any bugs
-directly to the Emacs mailing list, as the source is not modified
-here.
+This repository automatically builds GNU Emacs for macOS every day at 00:00 UTC directly from the latest upstream Git sources, with a small number of patches applied.
 
-No package manager is used during the build process, as all external
-dependencies are fetched from upstream and compiled from source. A
-statically linked Emacs is produced (except the system components),
-making link time optimization possible.
+Two build workflows are provided:
 
-> [!Note]
-> Emacs is built with the GNU MP Bignum Library, GnuTLS, Tree Sitter,
-> XML2 and Zlib.  Native compilation is likely not supported, since
-> compiling libgccjit is considered too resource-intensive, and it
-> will probably take hours to generate native components after temacs
-> bootstrap.
+* Static Build – Links against as many libraries statically as practical.
+* Dynamic Build – Uses dynamically linked libraries.
+
+Each workflow produces three Emacs variants:
+
+* Vanilla Emacs
+* Emacs with MPS support
+* Emacs with libgccjit support
+
+### About the build process
+
+The original practice of the parent project was to avoid relying on package managers entirely. In practice, however, I find some build tools and libraries have extensive dependency chains, and maintaining fully static builds for all of them would require a huge amount of effort.
+I thus use some build tools and libraries from Homebrew, while leave others fetched directly from their upstream sources, built locally, and linked statically whenever practical.
