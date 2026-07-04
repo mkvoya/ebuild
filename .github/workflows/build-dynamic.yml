@@ -23,7 +23,8 @@ jobs:
       - name: Install dependencies
         run: |
           brew update
-          brew upgrade
+          brew unlink ruby@3.4 || true
+          brew upgrade || true
           brew install m4
           brew install autoconf
           brew install automake
