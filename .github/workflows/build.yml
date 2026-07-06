@@ -547,9 +547,20 @@ jobs:
       - name: Setup libgccjit environment
         run: |
           LIBGCCJIT_PREFIX=$(brew --prefix libgccjit)
+          GCC_PREFIX=$(brew --prefix gcc)
+          # Find the versioned GCC runtime lib directory (e.g. .../lib/gcc/15 or .../lib/gcc/current)
+          GCC_LIB=$(ls -d "${GCC_PREFIX}/lib/gcc/"* 2>/dev/null | grep -E '/[0-9]+$' | sort -V | tail -1)
+          if [ -z "$GCC_LIB" ]; then
+            GCC_LIB="${GCC_PREFIX}/lib/gcc/current"
+          fi
           echo "PKG_CONFIG_PATH=${LIBGCCJIT_PREFIX}/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
           echo "CPPFLAGS=-I${LIBGCCJIT_PREFIX}/include $CPPFLAGS" >> $GITHUB_ENV
-          echo "LDFLAGS=-L${LIBGCCJIT_PREFIX}/lib $LDFLAGS" >> $GITHUB_ENV
+          echo "LDFLAGS=-L${LIBGCCJIT_PREFIX}/lib -L${GCC_LIB} -Wl,-rpath,${GCC_LIB} $LDFLAGS" >> $GITHUB_ENV
+          DYLD_EXTRA="${GCC_LIB}:${LIBGCCJIT_PREFIX}/lib"
+          if [ -n "${DYLD_LIBRARY_PATH}" ]; then
+            DYLD_EXTRA="${DYLD_EXTRA}:${DYLD_LIBRARY_PATH}"
+          fi
+          echo "DYLD_LIBRARY_PATH=${DYLD_EXTRA}" >> $GITHUB_ENV
       - name: Setup upterm session
         if: github.event_name == 'workflow_dispatch' && github.event.inputs.debug == 'true'
         uses: owenthereal/action-upterm@v1
@@ -561,7 +572,7 @@ jobs:
           # Check if this is librsvg or imagemagick by examining all arguments
           USE_DYNAMIC=false
           for arg in "$@"; do
-            if [[ "$arg" =~ (librsvg|rsvg|Magick|ImageMagick) ]]; then
+            if [[ "$arg" =~ (librsvg|rsvg|Magick|ImageMagick|libgccjit|gccjit) ]]; then
               USE_DYNAMIC=true
               break
             fi
