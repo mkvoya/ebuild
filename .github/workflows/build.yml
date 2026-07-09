@@ -548,10 +548,18 @@ jobs:
         run: |
           LIBGCCJIT_PREFIX=$(brew --prefix libgccjit)
           GCC_PREFIX=$(brew --prefix gcc)
-          # Find the versioned GCC runtime lib directory (e.g. .../lib/gcc/15 or .../lib/gcc/current)
-          GCC_LIB=$(ls -d "${GCC_PREFIX}/lib/gcc/"* 2>/dev/null | grep -E '/[0-9]+$' | sort -V | tail -1)
-          if [ -z "$GCC_LIB" ]; then
-            GCC_LIB="${GCC_PREFIX}/lib/gcc/current"
+          # Use GCC's own mechanism to locate its runtime lib directory. This is
+          # more robust than directory listing + regex, which breaks when Homebrew
+          # uses versioned subdirectory names like "15.1.0" instead of "15".
+          GCC_BIN=$(ls "${GCC_PREFIX}/bin/gcc-"[0-9]* 2>/dev/null | sort -V | tail -1)
+          if [ -n "$GCC_BIN" ]; then
+            GCC_LIB=$(dirname "$($GCC_BIN -print-libgcc-file-name)")
+          else
+            # Fallback: match any subdirectory that is not "current"
+            GCC_LIB=$(ls -d "${GCC_PREFIX}/lib/gcc/"* 2>/dev/null | grep -Ev '/current$' | sort -V | tail -1)
+            if [ -z "$GCC_LIB" ]; then
+              GCC_LIB="${GCC_PREFIX}/lib/gcc/current"
+            fi
           fi
           echo "PKG_CONFIG_PATH=${LIBGCCJIT_PREFIX}/lib/pkgconfig:$PKG_CONFIG_PATH" >> $GITHUB_ENV
           echo "CPPFLAGS=-I${LIBGCCJIT_PREFIX}/include $CPPFLAGS" >> $GITHUB_ENV
