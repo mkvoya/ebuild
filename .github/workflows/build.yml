@@ -561,9 +561,6 @@ jobs:
             DYLD_EXTRA="${DYLD_EXTRA}:${DYLD_LIBRARY_PATH}"
           fi
           echo "DYLD_LIBRARY_PATH=${DYLD_EXTRA}" >> $GITHUB_ENV
-      - name: Setup upterm session
-        if: github.event_name == 'workflow_dispatch' && github.event.inputs.debug == 'true'
-        uses: owenthereal/action-upterm@v1
       - name: Create pkg-config wrapper for selective static linking
         run: |
           cat > /tmp/pkg-config-wrapper << 'EOF'
@@ -587,6 +584,9 @@ jobs:
           fi
           EOF
           chmod +x /tmp/pkg-config-wrapper
+      - name: Setup upterm session
+        if: github.event_name == 'workflow_dispatch' && github.event.inputs.debug == 'true'
+        uses: owenthereal/action-upterm@v1
       - name: Build Emacs
         run: |
           git clone --depth 1 https://github.com/emacs-mirror/emacs.git
